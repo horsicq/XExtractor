@@ -23,12 +23,35 @@
 
 #include "xbinary.h"
 
-class XExtractor: public XBinary
+class XExtractor: public QObject
 {
     Q_OBJECT
 
 public:
-    XExtractor(QIODevice *pDevice);
+    struct OPTIONS
+    {
+        bool bPE;
+        bool bELF;
+        bool bMACHO;
+        bool bMACHOFAT;
+        bool bZIP;
+        bool bRAR;
+    };
+
+    XExtractor(QObject *pParent=nullptr);
+
+    void setData(QIODevice *pDevice,OPTIONS options,XBinary::PDSTRUCT *pPdStruct);
+
+signals:
+    void completed(qint64 nElapsed);
+
+public slots:
+    void process();
+
+private:
+    QIODevice *g_pDevice;
+    OPTIONS g_options;
+    XBinary::PDSTRUCT *g_pPdStruct;
 };
 
 #endif // XEXTRACTOR_H

@@ -20,7 +20,21 @@
  */
 #include "xextractor.h"
 
-XExtractor::XExtractor(QIODevice *pDevice): XBinary(pDevice)
+XExtractor::XExtractor(QObject *pParent): QObject(pParent)
 {
+    g_pDevice=nullptr;
+    g_options={};
+    g_pPdStruct=nullptr;
+}
 
+void XExtractor::setData(QIODevice *pDevice,OPTIONS options,XBinary::PDSTRUCT *pPdStruct)
+{
+    g_pDevice=pDevice;
+    g_options=options;
+    g_pPdStruct=pPdStruct;
+}
+
+void XExtractor::process()
+{
+    // TODO
 }
