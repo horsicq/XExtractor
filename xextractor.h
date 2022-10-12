@@ -36,6 +36,7 @@ public:
         bool bMACHOFAT;
         bool bZIP;
         bool bRAR;
+        bool bPDF;
     };
 
     XExtractor(QObject *pParent=nullptr);
