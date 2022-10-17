@@ -23,18 +23,33 @@
 XExtractor::XExtractor(QObject *pParent): QObject(pParent)
 {
     g_pDevice=nullptr;
-    g_options={};
+    g_pData=nullptr;
     g_pPdStruct=nullptr;
 }
 
-void XExtractor::setData(QIODevice *pDevice,OPTIONS options,XBinary::PDSTRUCT *pPdStruct)
+void XExtractor::setData(QIODevice *pDevice, DATA *pData, XBinary::PDSTRUCT *pPdStruct)
 {
     g_pDevice=pDevice;
-    g_options=options;
+    g_pData=pData;
     g_pPdStruct=pPdStruct;
 }
 
 void XExtractor::process()
 {
+    QElapsedTimer scanTimer;
+    scanTimer.start();
+
+    qint32 _nFreeIndex=XBinary::getFreeIndex(g_pPdStruct);
+    XBinary::setPdStructInit(g_pPdStruct,_nFreeIndex,0);
+
+    XBinary binary(g_pDevice);
+
+    connect(&binary,SIGNAL(errorMessage(QString)),this,SIGNAL(errorMessage(QString)));
+
+
     // TODO
+
+    XBinary::setPdStructFinished(g_pPdStruct,_nFreeIndex);
+
+    emit completed(scanTimer.elapsed());
 }

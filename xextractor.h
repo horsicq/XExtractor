@@ -39,11 +39,17 @@ public:
         bool bPDF;
     };
 
+    struct DATA
+    {
+        OPTIONS options;
+    };
+
     XExtractor(QObject *pParent=nullptr);
 
-    void setData(QIODevice *pDevice,OPTIONS options,XBinary::PDSTRUCT *pPdStruct);
+    void setData(QIODevice *pDevice,DATA *pData,XBinary::PDSTRUCT *pPdStruct);
 
 signals:
+    void errorMessage(QString sText);
     void completed(qint64 nElapsed);
 
 public slots:
@@ -51,7 +57,7 @@ public slots:
 
 private:
     QIODevice *g_pDevice;
-    OPTIONS g_options;
+    DATA *g_pData;
     XBinary::PDSTRUCT *g_pPdStruct;
 };
 
