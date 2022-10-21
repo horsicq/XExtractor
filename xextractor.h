@@ -39,9 +39,18 @@ public:
         bool bPDF;
     };
 
+    struct RECORD
+    {
+        qint64 nOffset;
+        qint64 nSize;
+        XBinary::FT fileType;
+        QString sString;
+    };
+
     struct DATA
     {
         OPTIONS options;
+        QList<RECORD> listRecords;
     };
 
     XExtractor(QObject *pParent=nullptr);
