@@ -27,7 +27,7 @@ XExtractor::XExtractor(QObject *pParent): QObject(pParent)
     g_pPdStruct=nullptr;
 }
 
-void XExtractor::setData(QIODevice *pDevice, DATA *pData, XBinary::PDSTRUCT *pPdStruct)
+void XExtractor::setData(QIODevice *pDevice,DATA *pData,XBinary::PDSTRUCT *pPdStruct)
 {
     g_pDevice=pDevice;
     g_pData=pData;
