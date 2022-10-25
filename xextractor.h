@@ -37,6 +37,7 @@ public:
         bool bZIP;
         bool bRAR;
         bool bPDF;
+        // TODO more
     };
 
     struct RECORD
