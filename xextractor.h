@@ -22,6 +22,7 @@
 #define XEXTRACTOR_H
 
 #include "xbinary.h"
+#include "xsevenzip.h"
 
 class XExtractor: public QObject
 {
@@ -30,14 +31,7 @@ class XExtractor: public QObject
 public:
     struct OPTIONS
     {
-        bool bPE;
-        bool bELF;
-        bool bMACHO;
-        bool bMACHOFAT;
-        bool bZIP;
-        bool bRAR;
-        bool bPDF;
-        // TODO more
+        QSet<XBinary::FT> fileTypes;
     };
 
     struct RECORD

@@ -39,13 +39,62 @@ void XExtractor::process()
     QElapsedTimer scanTimer;
     scanTimer.start();
 
+    g_pData->listRecords.clear();
+
     qint32 _nFreeIndex=XBinary::getFreeIndex(g_pPdStruct);
-    XBinary::setPdStructInit(g_pPdStruct,_nFreeIndex,0);
+    XBinary::setPdStructInit(g_pPdStruct,_nFreeIndex,g_pData->options.fileTypes.count());
 
     XBinary binary(g_pDevice);
 
+    XBinary::_MEMORY_MAP memoryMap=binary.getMemoryMap();
+
     connect(&binary,SIGNAL(errorMessage(QString)),this,SIGNAL(errorMessage(QString)));
 
+    if(g_pData->options.fileTypes.contains(XBinary::FT_7Z))
+    {
+        qint64 nOffset=0;
+
+        while(!(g_pPdStruct->bIsStop))
+        {
+            nOffset=binary.find_signature(&memoryMap,nOffset,-1,"'7z'BCAF271C",nullptr,g_pPdStruct);
+
+            if(nOffset!=-1)
+            {
+                SubDevice subevice(g_pDevice,nOffset,-1);
+
+                if(subevice.open(QIODevice::ReadOnly))
+                {
+                    XSevenZip sevenZip(&subevice);
+
+                    if(sevenZip.isValid())
+                    {
+                        qint64 nFileFormatSize=sevenZip.getFileFormatSize();
+
+                        if(nFileFormatSize)
+                        {
+                            RECORD record={};
+
+                            record.nOffset=nOffset;
+                            record.nSize=nFileFormatSize;
+                            record.fileType=XBinary::FT_PDF;
+
+                            g_pData->listRecords.append(record);
+                        }
+                    }
+
+                    subevice.close();
+                }
+
+                nOffset++;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        XBinary::setPdStructCurrentIncrement(g_pPdStruct,_nFreeIndex);
+    }
 
     // TODO
 
