@@ -96,7 +96,7 @@ void XExtractor::process()
         XBinary::setPdStructCurrentIncrement(g_pPdStruct,_nFreeIndex);
     }
 
-    // TODO
+    // TODO more
 
     XBinary::setPdStructFinished(g_pPdStruct,_nFreeIndex);
 
