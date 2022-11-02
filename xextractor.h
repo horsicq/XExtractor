@@ -21,8 +21,7 @@
 #ifndef XEXTRACTOR_H
 #define XEXTRACTOR_H
 
-#include "xbinary.h"
-#include "xsevenzip.h"
+#include "xformats.h"
 
 class XExtractor: public QObject
 {
@@ -51,6 +50,9 @@ public:
     XExtractor(QObject *pParent=nullptr);
 
     void setData(QIODevice *pDevice,DATA *pData,XBinary::PDSTRUCT *pPdStruct);
+
+private:
+    qint64 tryToAddRecord(qint64 nOffset,XBinary::FT fileType);
 
 signals:
     void errorMessage(QString sText);

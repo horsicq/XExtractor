@@ -34,6 +34,37 @@ void XExtractor::setData(QIODevice *pDevice,DATA *pData,XBinary::PDSTRUCT *pPdSt
     g_pPdStruct=pPdStruct;
 }
 
+qint64 XExtractor::tryToAddRecord(qint64 nOffset, XBinary::FT fileType)
+{
+    qint64 nResult=0;
+
+    SubDevice subevice(g_pDevice,nOffset,-1);
+
+    if(subevice.open(QIODevice::ReadOnly))
+    {
+        if(XFormats::isValid(fileType,&subevice))
+        {
+            RECORD record={};
+
+            record.nOffset=nOffset;
+            record.nSize=XFormats::getFileFormatSize(fileType,&subevice);
+            record.sString=XFormats::getFileFormatString(fileType,&subevice);
+            record.fileType=fileType;
+
+            g_pData->listRecords.append(record);
+        }
+
+        subevice.close();
+    }
+
+    if(nResult==0)
+    {
+        nResult=1;
+    }
+
+    return nResult;
+}
+
 void XExtractor::process()
 {
     QElapsedTimer scanTimer;
@@ -50,7 +81,27 @@ void XExtractor::process()
 
     connect(&binary,SIGNAL(errorMessage(QString)),this,SIGNAL(errorMessage(QString)));
 
-    if(g_pData->options.fileTypes.contains(XBinary::FT_7Z))
+    if(g_pData->options.fileTypes.contains(XBinary::FT_PE))
+    {
+        qint64 nOffset=0;
+
+        while(!(g_pPdStruct->bIsStop))
+        {
+            nOffset=binary.find_signature(&memoryMap,nOffset,-1,"'MZ'",nullptr,g_pPdStruct);
+
+            if(nOffset!=-1)
+            {
+                nOffset+=tryToAddRecord(nOffset,XBinary::FT_PE);
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        XBinary::setPdStructCurrentIncrement(g_pPdStruct,_nFreeIndex);
+    }
+    else if(g_pData->options.fileTypes.contains(XBinary::FT_7Z))
     {
         qint64 nOffset=0;
 
@@ -60,32 +111,7 @@ void XExtractor::process()
 
             if(nOffset!=-1)
             {
-                SubDevice subevice(g_pDevice,nOffset,-1);
-
-                if(subevice.open(QIODevice::ReadOnly))
-                {
-                    XSevenZip sevenZip(&subevice);
-
-                    if(sevenZip.isValid())
-                    {
-                        qint64 nFileFormatSize=sevenZip.getFileFormatSize();
-
-                        if(nFileFormatSize)
-                        {
-                            RECORD record={};
-
-                            record.nOffset=nOffset;
-                            record.nSize=nFileFormatSize;
-                            record.fileType=XBinary::FT_PDF;
-
-                            g_pData->listRecords.append(record);
-                        }
-                    }
-
-                    subevice.close();
-                }
-
-                nOffset++;
+                nOffset+=tryToAddRecord(nOffset,XBinary::FT_7Z);
             }
             else
             {
