@@ -39,6 +39,7 @@ public:
         qint64 nSize;
         XBinary::FT fileType;
         QString sString;
+        QString sExt;
     };
 
     struct DATA

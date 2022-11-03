@@ -49,7 +49,14 @@ qint64 XExtractor::tryToAddRecord(qint64 nOffset, XBinary::FT fileType)
             record.nOffset=nOffset;
             record.nSize=XFormats::getFileFormatSize(fileType,&subevice);
             record.sString=XFormats::getFileFormatString(fileType,&subevice);
+            record.sExt=XFormats::getFileFormatExt(fileType,&subevice);
             record.fileType=fileType;
+
+            // Fix if more than the device size
+            if((record.nOffset+record.nSize)>g_pDevice->size())
+            {
+                record.nSize=(g_pDevice->size()-record.nOffset);
+            }
 
             g_pData->listRecords.append(record);
         }
@@ -101,7 +108,8 @@ void XExtractor::process()
 
         XBinary::setPdStructCurrentIncrement(g_pPdStruct,_nFreeIndex);
     }
-    else if(g_pData->options.fileTypes.contains(XBinary::FT_7Z))
+
+    if(g_pData->options.fileTypes.contains(XBinary::FT_7Z))
     {
         qint64 nOffset=0;
 
