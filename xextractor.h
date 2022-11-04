@@ -30,7 +30,7 @@ class XExtractor: public QObject
 public:
     struct OPTIONS
     {
-        QSet<XBinary::FT> fileTypes;
+        QList<XBinary::FT> listFileTypes;
     };
 
     struct RECORD
@@ -51,6 +51,9 @@ public:
     XExtractor(QObject *pParent=nullptr);
 
     void setData(QIODevice *pDevice,DATA *pData,XBinary::PDSTRUCT *pPdStruct);
+
+    static QList<XBinary::FT> getAvailableFileTypes();
+    static XExtractor::OPTIONS getDefaultOptions();
 
 private:
     qint64 tryToAddRecord(qint64 nOffset,XBinary::FT fileType);

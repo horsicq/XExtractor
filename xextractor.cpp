@@ -34,6 +34,28 @@ void XExtractor::setData(QIODevice *pDevice,DATA *pData,XBinary::PDSTRUCT *pPdSt
     g_pPdStruct=pPdStruct;
 }
 
+QList<XBinary::FT> XExtractor::getAvailableFileTypes()
+{
+    QList<XBinary::FT> listResult;
+
+    listResult.append(XBinary::FT_PE);
+    listResult.append(XBinary::FT_ZIP);
+    listResult.append(XBinary::FT_PDF);
+    listResult.append(XBinary::FT_7Z);
+
+    return listResult;
+}
+
+XExtractor::OPTIONS XExtractor::getDefaultOptions()
+{
+    XExtractor::OPTIONS result={};
+
+    result.listFileTypes.append(XBinary::FT_PE);
+    result.listFileTypes.append(XBinary::FT_7Z);
+
+    return result;
+}
+
 qint64 XExtractor::tryToAddRecord(qint64 nOffset, XBinary::FT fileType)
 {
     qint64 nResult=0;
@@ -80,7 +102,7 @@ void XExtractor::process()
     g_pData->listRecords.clear();
 
     qint32 _nFreeIndex=XBinary::getFreeIndex(g_pPdStruct);
-    XBinary::setPdStructInit(g_pPdStruct,_nFreeIndex,g_pData->options.fileTypes.count());
+    XBinary::setPdStructInit(g_pPdStruct,_nFreeIndex,g_pData->options.listFileTypes.count());
 
     XBinary binary(g_pDevice);
 
@@ -88,7 +110,7 @@ void XExtractor::process()
 
     connect(&binary,SIGNAL(errorMessage(QString)),this,SIGNAL(errorMessage(QString)));
 
-    if(g_pData->options.fileTypes.contains(XBinary::FT_PE))
+    if(g_pData->options.listFileTypes.contains(XBinary::FT_PE))
     {
         qint64 nOffset=0;
 
@@ -109,7 +131,7 @@ void XExtractor::process()
         XBinary::setPdStructCurrentIncrement(g_pPdStruct,_nFreeIndex);
     }
 
-    if(g_pData->options.fileTypes.contains(XBinary::FT_7Z))
+    if(g_pData->options.listFileTypes.contains(XBinary::FT_7Z))
     {
         qint64 nOffset=0;
 
