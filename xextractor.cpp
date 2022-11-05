@@ -56,7 +56,7 @@ XExtractor::OPTIONS XExtractor::getDefaultOptions()
     return result;
 }
 
-qint64 XExtractor::tryToAddRecord(qint64 nOffset, XBinary::FT fileType)
+qint64 XExtractor::tryToAddRecord(qint64 nOffset,XBinary::FT fileType)
 {
     qint64 nResult=0;
 
