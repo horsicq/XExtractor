@@ -152,6 +152,27 @@ void XExtractor::process()
         XBinary::setPdStructCurrentIncrement(g_pPdStruct,_nFreeIndex);
     }
 
+    if(g_pData->options.listFileTypes.contains(XBinary::FT_DEX))
+    {
+        qint64 nOffset=0;
+
+        while(!(g_pPdStruct->bIsStop))
+        {
+            nOffset=binary.find_signature(&memoryMap,nOffset,-1,"'dex\n'",nullptr,g_pPdStruct);
+
+            if(nOffset!=-1)
+            {
+                nOffset+=tryToAddRecord(nOffset,XBinary::FT_DEX);
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        XBinary::setPdStructCurrentIncrement(g_pPdStruct,_nFreeIndex);
+    }
+
     // TODO more
 
     XBinary::setPdStructFinished(g_pPdStruct,_nFreeIndex);
