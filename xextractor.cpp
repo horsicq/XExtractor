@@ -51,6 +51,8 @@ XExtractor::OPTIONS XExtractor::getDefaultOptions()
     XExtractor::OPTIONS result={};
 
     result.listFileTypes.append(XBinary::FT_PE);
+    result.listFileTypes.append(XBinary::FT_ZIP);
+    result.listFileTypes.append(XBinary::FT_PDF);
     result.listFileTypes.append(XBinary::FT_7Z);
 
     return result;
@@ -163,6 +165,27 @@ void XExtractor::process()
             if(nOffset!=-1)
             {
                 nOffset+=tryToAddRecord(nOffset,XBinary::FT_DEX);
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        XBinary::setPdStructCurrentIncrement(g_pPdStruct,_nFreeIndex);
+    }
+
+    if(g_pData->options.listFileTypes.contains(XBinary::FT_PDF))
+    {
+        qint64 nOffset=0;
+
+        while(!(g_pPdStruct->bIsStop))
+        {
+            nOffset=binary.find_signature(&memoryMap,nOffset,-1,"'%PDF'",nullptr,g_pPdStruct);
+
+            if(nOffset!=-1)
+            {
+                nOffset+=tryToAddRecord(nOffset,XBinary::FT_PDF);
             }
             else
             {
