@@ -7,8 +7,8 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -20,22 +20,20 @@
  */
 #include "xextractor.h"
 
-XExtractor::XExtractor(QObject *pParent): QObject(pParent)
-{
-    g_pDevice=nullptr;
-    g_pData=nullptr;
-    g_pPdStruct=nullptr;
+XExtractor::XExtractor(QObject *pParent) : QObject(pParent) {
+    g_pDevice = nullptr;
+    g_pData = nullptr;
+    g_pPdStruct = nullptr;
 }
 
-void XExtractor::setData(QIODevice *pDevice,DATA *pData,XBinary::PDSTRUCT *pPdStruct)
-{
-    g_pDevice=pDevice;
-    g_pData=pData;
-    g_pPdStruct=pPdStruct;
+void XExtractor::setData(QIODevice *pDevice, DATA *pData,
+                         XBinary::PDSTRUCT *pPdStruct) {
+    g_pDevice = pDevice;
+    g_pData = pData;
+    g_pPdStruct = pPdStruct;
 }
 
-QList<XBinary::FT> XExtractor::getAvailableFileTypes()
-{
+QList<XBinary::FT> XExtractor::getAvailableFileTypes() {
     QList<XBinary::FT> listResult;
 
     listResult.append(XBinary::FT_PE);
@@ -46,9 +44,8 @@ QList<XBinary::FT> XExtractor::getAvailableFileTypes()
     return listResult;
 }
 
-XExtractor::OPTIONS XExtractor::getDefaultOptions()
-{
-    XExtractor::OPTIONS result={};
+XExtractor::OPTIONS XExtractor::getDefaultOptions() {
+    XExtractor::OPTIONS result = {};
 
     result.listFileTypes.append(XBinary::FT_PE);
     result.listFileTypes.append(XBinary::FT_ZIP);
@@ -58,28 +55,24 @@ XExtractor::OPTIONS XExtractor::getDefaultOptions()
     return result;
 }
 
-qint64 XExtractor::tryToAddRecord(qint64 nOffset,XBinary::FT fileType)
-{
-    qint64 nResult=0;
+qint64 XExtractor::tryToAddRecord(qint64 nOffset, XBinary::FT fileType) {
+    qint64 nResult = 0;
 
-    SubDevice subevice(g_pDevice,nOffset,-1);
+    SubDevice subevice(g_pDevice, nOffset, -1);
 
-    if(subevice.open(QIODevice::ReadOnly))
-    {
-        if(XFormats::isValid(fileType,&subevice))
-        {
-            RECORD record={};
+    if (subevice.open(QIODevice::ReadOnly)) {
+        if (XFormats::isValid(fileType, &subevice)) {
+            RECORD record = {};
 
-            record.nOffset=nOffset;
-            record.nSize=XFormats::getFileFormatSize(fileType,&subevice);
-            record.sString=XFormats::getFileFormatString(fileType,&subevice);
-            record.sExt=XFormats::getFileFormatExt(fileType,&subevice);
-            record.fileType=fileType;
+            record.nOffset = nOffset;
+            record.nSize = XFormats::getFileFormatSize(fileType, &subevice);
+            record.sString = XFormats::getFileFormatString(fileType, &subevice);
+            record.sExt = XFormats::getFileFormatExt(fileType, &subevice);
+            record.fileType = fileType;
 
             // Fix if more than the device size
-            if((record.nOffset+record.nSize)>g_pDevice->size())
-            {
-                record.nSize=(g_pDevice->size()-record.nOffset);
+            if ((record.nOffset + record.nSize) > g_pDevice->size()) {
+                record.nSize = (g_pDevice->size() - record.nOffset);
             }
 
             g_pData->listRecords.append(record);
@@ -88,117 +81,101 @@ qint64 XExtractor::tryToAddRecord(qint64 nOffset,XBinary::FT fileType)
         subevice.close();
     }
 
-    if(nResult==0)
-    {
-        nResult=1;
+    if (nResult == 0) {
+        nResult = 1;
     }
 
     return nResult;
 }
 
-void XExtractor::process()
-{
+void XExtractor::process() {
     QElapsedTimer scanTimer;
     scanTimer.start();
 
     g_pData->listRecords.clear();
 
-    qint32 _nFreeIndex=XBinary::getFreeIndex(g_pPdStruct);
-    XBinary::setPdStructInit(g_pPdStruct,_nFreeIndex,g_pData->options.listFileTypes.count());
+    qint32 _nFreeIndex = XBinary::getFreeIndex(g_pPdStruct);
+    XBinary::setPdStructInit(g_pPdStruct, _nFreeIndex,
+                             g_pData->options.listFileTypes.count());
 
     XBinary binary(g_pDevice);
 
-    XBinary::_MEMORY_MAP memoryMap=binary.getMemoryMap();
+    XBinary::_MEMORY_MAP memoryMap = binary.getMemoryMap();
 
-    connect(&binary,SIGNAL(errorMessage(QString)),this,SIGNAL(errorMessage(QString)));
+    connect(&binary, SIGNAL(errorMessage(QString)), this,
+            SIGNAL(errorMessage(QString)));
 
-    if(g_pData->options.listFileTypes.contains(XBinary::FT_PE))
-    {
-        qint64 nOffset=0;
+    if (g_pData->options.listFileTypes.contains(XBinary::FT_PE)) {
+        qint64 nOffset = 0;
 
-        while(!(g_pPdStruct->bIsStop))
-        {
-            nOffset=binary.find_signature(&memoryMap,nOffset,-1,"'MZ'",nullptr,g_pPdStruct);
+        while (!(g_pPdStruct->bIsStop)) {
+            nOffset = binary.find_signature(&memoryMap, nOffset, -1, "'MZ'",
+                                            nullptr, g_pPdStruct);
 
-            if(nOffset!=-1)
-            {
-                nOffset+=tryToAddRecord(nOffset,XBinary::FT_PE);
-            }
-            else
-            {
+            if (nOffset != -1) {
+                nOffset += tryToAddRecord(nOffset, XBinary::FT_PE);
+            } else {
                 break;
             }
         }
 
-        XBinary::setPdStructCurrentIncrement(g_pPdStruct,_nFreeIndex);
+        XBinary::setPdStructCurrentIncrement(g_pPdStruct, _nFreeIndex);
     }
 
-    if(g_pData->options.listFileTypes.contains(XBinary::FT_7Z))
-    {
-        qint64 nOffset=0;
+    if (g_pData->options.listFileTypes.contains(XBinary::FT_7Z)) {
+        qint64 nOffset = 0;
 
-        while(!(g_pPdStruct->bIsStop))
-        {
-            nOffset=binary.find_signature(&memoryMap,nOffset,-1,"'7z'BCAF271C",nullptr,g_pPdStruct);
+        while (!(g_pPdStruct->bIsStop)) {
+            nOffset = binary.find_signature(
+                &memoryMap, nOffset, -1, "'7z'BCAF271C", nullptr, g_pPdStruct);
 
-            if(nOffset!=-1)
-            {
-                nOffset+=tryToAddRecord(nOffset,XBinary::FT_7Z);
-            }
-            else
-            {
+            if (nOffset != -1) {
+                nOffset += tryToAddRecord(nOffset, XBinary::FT_7Z);
+            } else {
                 break;
             }
         }
 
-        XBinary::setPdStructCurrentIncrement(g_pPdStruct,_nFreeIndex);
+        XBinary::setPdStructCurrentIncrement(g_pPdStruct, _nFreeIndex);
     }
 
-    if(g_pData->options.listFileTypes.contains(XBinary::FT_DEX))
-    {
-        qint64 nOffset=0;
+    if (g_pData->options.listFileTypes.contains(XBinary::FT_DEX)) {
+        qint64 nOffset = 0;
 
-        while(!(g_pPdStruct->bIsStop))
-        {
-            nOffset=binary.find_signature(&memoryMap,nOffset,-1,"'dex\n'",nullptr,g_pPdStruct);
+        while (!(g_pPdStruct->bIsStop)) {
+            nOffset = binary.find_signature(&memoryMap, nOffset, -1, "'dex\n'",
+                                            nullptr, g_pPdStruct);
 
-            if(nOffset!=-1)
-            {
-                nOffset+=tryToAddRecord(nOffset,XBinary::FT_DEX);
-            }
-            else
-            {
+            if (nOffset != -1) {
+                nOffset += tryToAddRecord(nOffset, XBinary::FT_DEX);
+            } else {
                 break;
             }
         }
 
-        XBinary::setPdStructCurrentIncrement(g_pPdStruct,_nFreeIndex);
+        XBinary::setPdStructCurrentIncrement(g_pPdStruct, _nFreeIndex);
     }
 
-    if(g_pData->options.listFileTypes.contains(XBinary::FT_PDF))
-    {
-        qint64 nOffset=0;
+    if (g_pData->options.listFileTypes.contains(XBinary::FT_PDF)) {
+        qint64 nOffset = 0;
 
-        while(!(g_pPdStruct->bIsStop))
-        {
-            nOffset=binary.find_signature(&memoryMap,nOffset,-1,"'%PDF'",nullptr,g_pPdStruct);
+        while (!(g_pPdStruct->bIsStop)) {
+            nOffset = binary.find_signature(&memoryMap, nOffset, -1, "'%PDF'",
+                                            nullptr, g_pPdStruct);
 
-            if(nOffset!=-1)
-            {
-                nOffset+=tryToAddRecord(nOffset,XBinary::FT_PDF);
-            }
-            else
-            {
+            if (nOffset != -1) {
+                nOffset += tryToAddRecord(nOffset, XBinary::FT_PDF);
+            } else {
                 break;
             }
         }
 
-        XBinary::setPdStructCurrentIncrement(g_pPdStruct,_nFreeIndex);
+        XBinary::setPdStructCurrentIncrement(g_pPdStruct, _nFreeIndex);
     }
 
     // TODO more
 
-    XBinary::setPdStructFinished(g_pPdStruct,_nFreeIndex);
+    XBinary::setPdStructFinished(g_pPdStruct, _nFreeIndex);
 
     emit completed(scanTimer.elapsed());
 }
