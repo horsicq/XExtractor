@@ -26,9 +26,10 @@
 class XExtractor : public QObject {
     Q_OBJECT
 
-   public:
+public:
     struct OPTIONS {
         QList<XBinary::FT> listFileTypes;
+        bool bMenu_Hex;
     };
 
     struct RECORD {
@@ -51,17 +52,17 @@ class XExtractor : public QObject {
     static QList<XBinary::FT> getAvailableFileTypes();
     static XExtractor::OPTIONS getDefaultOptions();
 
-   private:
+private:
     qint64 tryToAddRecord(qint64 nOffset, XBinary::FT fileType);
 
-   signals:
+signals:
     void errorMessage(QString sText);
     void completed(qint64 nElapsed);
 
-   public slots:
+public slots:
     void process();
 
-   private:
+private:
     QIODevice *g_pDevice;
     DATA *g_pData;
     XBinary::PDSTRUCT *g_pPdStruct;

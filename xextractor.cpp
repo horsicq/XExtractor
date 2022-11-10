@@ -26,8 +26,7 @@ XExtractor::XExtractor(QObject *pParent) : QObject(pParent) {
     g_pPdStruct = nullptr;
 }
 
-void XExtractor::setData(QIODevice *pDevice, DATA *pData,
-                         XBinary::PDSTRUCT *pPdStruct) {
+void XExtractor::setData(QIODevice *pDevice, DATA *pData, XBinary::PDSTRUCT *pPdStruct) {
     g_pDevice = pDevice;
     g_pData = pData;
     g_pPdStruct = pPdStruct;
@@ -66,16 +65,19 @@ qint64 XExtractor::tryToAddRecord(qint64 nOffset, XBinary::FT fileType) {
 
             record.nOffset = nOffset;
             record.nSize = XFormats::getFileFormatSize(fileType, &subevice);
-            record.sString = XFormats::getFileFormatString(fileType, &subevice);
-            record.sExt = XFormats::getFileFormatExt(fileType, &subevice);
-            record.fileType = fileType;
 
-            // Fix if more than the device size
-            if ((record.nOffset + record.nSize) > g_pDevice->size()) {
-                record.nSize = (g_pDevice->size() - record.nOffset);
+            if (record.nSize) {
+                record.sString = XFormats::getFileFormatString(fileType, &subevice);
+                record.sExt = XFormats::getFileFormatExt(fileType, &subevice);
+                record.fileType = fileType;
+
+                // Fix if more than the device size
+                if ((record.nOffset + record.nSize) > g_pDevice->size()) {
+                    record.nSize = (g_pDevice->size() - record.nOffset);
+                }
+
+                g_pData->listRecords.append(record);
             }
-
-            g_pData->listRecords.append(record);
         }
 
         subevice.close();
@@ -95,22 +97,19 @@ void XExtractor::process() {
     g_pData->listRecords.clear();
 
     qint32 _nFreeIndex = XBinary::getFreeIndex(g_pPdStruct);
-    XBinary::setPdStructInit(g_pPdStruct, _nFreeIndex,
-                             g_pData->options.listFileTypes.count());
+    XBinary::setPdStructInit(g_pPdStruct, _nFreeIndex, g_pData->options.listFileTypes.count());
 
     XBinary binary(g_pDevice);
 
     XBinary::_MEMORY_MAP memoryMap = binary.getMemoryMap();
 
-    connect(&binary, SIGNAL(errorMessage(QString)), this,
-            SIGNAL(errorMessage(QString)));
+    connect(&binary, SIGNAL(errorMessage(QString)), this, SIGNAL(errorMessage(QString)));
 
     if (g_pData->options.listFileTypes.contains(XBinary::FT_PE)) {
         qint64 nOffset = 0;
 
         while (!(g_pPdStruct->bIsStop)) {
-            nOffset = binary.find_signature(&memoryMap, nOffset, -1, "'MZ'",
-                                            nullptr, g_pPdStruct);
+            nOffset = binary.find_signature(&memoryMap, nOffset, -1, "'MZ'", nullptr, g_pPdStruct);
 
             if (nOffset != -1) {
                 nOffset += tryToAddRecord(nOffset, XBinary::FT_PE);
@@ -126,8 +125,7 @@ void XExtractor::process() {
         qint64 nOffset = 0;
 
         while (!(g_pPdStruct->bIsStop)) {
-            nOffset = binary.find_signature(
-                &memoryMap, nOffset, -1, "'7z'BCAF271C", nullptr, g_pPdStruct);
+            nOffset = binary.find_signature(&memoryMap, nOffset, -1, "'7z'BCAF271C", nullptr, g_pPdStruct);
 
             if (nOffset != -1) {
                 nOffset += tryToAddRecord(nOffset, XBinary::FT_7Z);
@@ -143,8 +141,7 @@ void XExtractor::process() {
         qint64 nOffset = 0;
 
         while (!(g_pPdStruct->bIsStop)) {
-            nOffset = binary.find_signature(&memoryMap, nOffset, -1, "'dex\n'",
-                                            nullptr, g_pPdStruct);
+            nOffset = binary.find_signature(&memoryMap, nOffset, -1, "'dex\n'", nullptr, g_pPdStruct);
 
             if (nOffset != -1) {
                 nOffset += tryToAddRecord(nOffset, XBinary::FT_DEX);
@@ -160,8 +157,7 @@ void XExtractor::process() {
         qint64 nOffset = 0;
 
         while (!(g_pPdStruct->bIsStop)) {
-            nOffset = binary.find_signature(&memoryMap, nOffset, -1, "'%PDF'",
-                                            nullptr, g_pPdStruct);
+            nOffset = binary.find_signature(&memoryMap, nOffset, -1, "'%PDF'", nullptr, g_pPdStruct);
 
             if (nOffset != -1) {
                 nOffset += tryToAddRecord(nOffset, XBinary::FT_PDF);
