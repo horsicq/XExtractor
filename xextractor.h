@@ -29,6 +29,7 @@ class XExtractor : public QObject {
 public:
     struct OPTIONS {
         QList<XBinary::FT> listFileTypes;
+        bool bDeepScan;
         bool bMenu_Hex;
     };
 

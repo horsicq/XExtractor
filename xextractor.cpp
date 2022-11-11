@@ -39,6 +39,8 @@ QList<XBinary::FT> XExtractor::getAvailableFileTypes() {
     listResult.append(XBinary::FT_ZIP);
     listResult.append(XBinary::FT_PDF);
     listResult.append(XBinary::FT_7Z);
+    listResult.append(XBinary::FT_PNG);
+    listResult.append(XBinary::FT_CAB);
 
     return listResult;
 }
@@ -50,6 +52,10 @@ XExtractor::OPTIONS XExtractor::getDefaultOptions() {
     result.listFileTypes.append(XBinary::FT_ZIP);
     result.listFileTypes.append(XBinary::FT_PDF);
     result.listFileTypes.append(XBinary::FT_7Z);
+    result.listFileTypes.append(XBinary::FT_PNG);
+    result.listFileTypes.append(XBinary::FT_CAB);
+
+    result.bDeepScan = true;
 
     return result;
 }
@@ -78,6 +84,8 @@ qint64 XExtractor::tryToAddRecord(qint64 nOffset, XBinary::FT fileType) {
 
                 g_pData->listRecords.append(record);
             }
+
+            nResult = record.nSize;
         }
 
         subevice.close();
@@ -85,6 +93,11 @@ qint64 XExtractor::tryToAddRecord(qint64 nOffset, XBinary::FT fileType) {
 
     if (nResult == 0) {
         nResult = 1;
+    }
+
+    if(g_pData->options.bDeepScan)
+    {
+         nResult = 1;
     }
 
     return nResult;
@@ -161,6 +174,38 @@ void XExtractor::process() {
 
             if (nOffset != -1) {
                 nOffset += tryToAddRecord(nOffset, XBinary::FT_PDF);
+            } else {
+                break;
+            }
+        }
+
+        XBinary::setPdStructCurrentIncrement(g_pPdStruct, _nFreeIndex);
+    }
+
+    if (g_pData->options.listFileTypes.contains(XBinary::FT_PNG)) {
+        qint64 nOffset = 0;
+
+        while (!(g_pPdStruct->bIsStop)) {
+            nOffset = binary.find_signature(&memoryMap, nOffset, -1, "89'PNG\r\n'1A0A", nullptr, g_pPdStruct);
+
+            if (nOffset != -1) {
+                nOffset += tryToAddRecord(nOffset, XBinary::FT_PNG);
+            } else {
+                break;
+            }
+        }
+
+        XBinary::setPdStructCurrentIncrement(g_pPdStruct, _nFreeIndex);
+    }
+
+    if (g_pData->options.listFileTypes.contains(XBinary::FT_CAB)) {
+        qint64 nOffset = 0;
+
+        while (!(g_pPdStruct->bIsStop)) {
+            nOffset = binary.find_signature(&memoryMap, nOffset, -1, "'MSCF'", nullptr, g_pPdStruct);
+
+            if (nOffset != -1) {
+                nOffset += tryToAddRecord(nOffset, XBinary::FT_CAB);
             } else {
                 break;
             }
