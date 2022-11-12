@@ -95,9 +95,8 @@ qint64 XExtractor::tryToAddRecord(qint64 nOffset, XBinary::FT fileType) {
         nResult = 1;
     }
 
-    if(g_pData->options.bDeepScan)
-    {
-         nResult = 1;
+    if (g_pData->options.bDeepScan) {
+        nResult = 1;
     }
 
     return nResult;
