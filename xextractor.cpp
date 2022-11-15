@@ -20,19 +20,22 @@
  */
 #include "xextractor.h"
 
-XExtractor::XExtractor(QObject *pParent) : QObject(pParent) {
+XExtractor::XExtractor(QObject *pParent) : QObject(pParent)
+{
     g_pDevice = nullptr;
     g_pData = nullptr;
     g_pPdStruct = nullptr;
 }
 
-void XExtractor::setData(QIODevice *pDevice, DATA *pData, XBinary::PDSTRUCT *pPdStruct) {
+void XExtractor::setData(QIODevice *pDevice, DATA *pData, XBinary::PDSTRUCT *pPdStruct)
+{
     g_pDevice = pDevice;
     g_pData = pData;
     g_pPdStruct = pPdStruct;
 }
 
-QList<XBinary::FT> XExtractor::getAvailableFileTypes() {
+QList<XBinary::FT> XExtractor::getAvailableFileTypes()
+{
     QList<XBinary::FT> listResult;
 
     listResult.append(XBinary::FT_PE);
@@ -45,7 +48,8 @@ QList<XBinary::FT> XExtractor::getAvailableFileTypes() {
     return listResult;
 }
 
-XExtractor::OPTIONS XExtractor::getDefaultOptions() {
+XExtractor::OPTIONS XExtractor::getDefaultOptions()
+{
     XExtractor::OPTIONS result = {};
 
     result.listFileTypes.append(XBinary::FT_PE);
@@ -60,7 +64,8 @@ XExtractor::OPTIONS XExtractor::getDefaultOptions() {
     return result;
 }
 
-qint64 XExtractor::tryToAddRecord(qint64 nOffset, XBinary::FT fileType) {
+qint64 XExtractor::tryToAddRecord(qint64 nOffset, XBinary::FT fileType)
+{
     qint64 nResult = 0;
 
     SubDevice subevice(g_pDevice, nOffset, -1);
@@ -102,7 +107,8 @@ qint64 XExtractor::tryToAddRecord(qint64 nOffset, XBinary::FT fileType) {
     return nResult;
 }
 
-void XExtractor::process() {
+void XExtractor::process()
+{
     QElapsedTimer scanTimer;
     scanTimer.start();
 
