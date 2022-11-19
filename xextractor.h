@@ -55,6 +55,7 @@ public:
 
 private:
     qint64 tryToAddRecord(qint64 nOffset, XBinary::FT fileType);
+    void handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap, XBinary::FT fileType,QString sSignature);
 
 signals:
     void errorMessage(QString sText);
@@ -67,6 +68,7 @@ private:
     QIODevice *g_pDevice;
     DATA *g_pData;
     XBinary::PDSTRUCT *g_pPdStruct;
+    qint32 g_nFreeIndex;
 };
 
 #endif  // XEXTRACTOR_H

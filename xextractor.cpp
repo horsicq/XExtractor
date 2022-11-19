@@ -26,6 +26,7 @@ XExtractor::XExtractor(QObject *pParent)
     g_pDevice = nullptr;
     g_pData = nullptr;
     g_pPdStruct = nullptr;
+    g_nFreeIndex = 0;
 }
 
 void XExtractor::setData(QIODevice *pDevice, DATA *pData, XBinary::PDSTRUCT *pPdStruct)
@@ -45,6 +46,8 @@ QList<XBinary::FT> XExtractor::getAvailableFileTypes()
     listResult.append(XBinary::FT_7Z);
     listResult.append(XBinary::FT_PNG);
     listResult.append(XBinary::FT_CAB);
+    listResult.append(XBinary::FT_ICO);
+    listResult.append(XBinary::FT_CUR);
 
     return listResult;
 }
@@ -59,6 +62,8 @@ XExtractor::OPTIONS XExtractor::getDefaultOptions()
     result.listFileTypes.append(XBinary::FT_7Z);
     result.listFileTypes.append(XBinary::FT_PNG);
     result.listFileTypes.append(XBinary::FT_CAB);
+    result.listFileTypes.append(XBinary::FT_ICO);
+    result.listFileTypes.append(XBinary::FT_CUR);
 
     result.bDeepScan = true;
 
@@ -101,11 +106,37 @@ qint64 XExtractor::tryToAddRecord(qint64 nOffset, XBinary::FT fileType)
         nResult = 1;
     }
 
-    if (g_pData->options.bDeepScan) {
+    if ((g_pData->options.bDeepScan) && (fileType!=XBinary::FT_ZIP)) {
         nResult = 1;
     }
 
     return nResult;
+}
+
+void XExtractor::handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap, XBinary::FT fileType, QString sSignature)
+{
+    if (g_pData->options.listFileTypes.contains(fileType)) {
+        qint64 nOffset = 0;
+
+        qint32 _nFreeIndex = XBinary::getFreeIndex(g_pPdStruct);
+        XBinary::setPdStructInit(g_pPdStruct, _nFreeIndex, pBinary->getSize());
+
+        while (!(g_pPdStruct->bIsStop)) {
+            nOffset = pBinary->find_signature(pMemoryMap, nOffset, -1, sSignature, nullptr, g_pPdStruct);
+
+            if (nOffset != -1) {
+                nOffset += tryToAddRecord(nOffset, fileType);
+            } else {
+                break;
+            }
+
+            XBinary::setPdStructCurrent(g_pPdStruct, _nFreeIndex, nOffset);
+        }
+
+        XBinary::setPdStructFinished(g_pPdStruct, _nFreeIndex);
+
+        XBinary::setPdStructCurrentIncrement(g_pPdStruct, g_nFreeIndex);
+    }
 }
 
 void XExtractor::process()
@@ -115,8 +146,8 @@ void XExtractor::process()
 
     g_pData->listRecords.clear();
 
-    qint32 _nFreeIndex = XBinary::getFreeIndex(g_pPdStruct);
-    XBinary::setPdStructInit(g_pPdStruct, _nFreeIndex, g_pData->options.listFileTypes.count());
+    g_nFreeIndex = XBinary::getFreeIndex(g_pPdStruct);
+    XBinary::setPdStructInit(g_pPdStruct, g_nFreeIndex, g_pData->options.listFileTypes.count());
 
     XBinary binary(g_pDevice);
 
@@ -124,105 +155,19 @@ void XExtractor::process()
 
     connect(&binary, SIGNAL(errorMessage(QString)), this, SIGNAL(errorMessage(QString)));
 
-    if (g_pData->options.listFileTypes.contains(XBinary::FT_PE)) {
-        qint64 nOffset = 0;
-
-        while (!(g_pPdStruct->bIsStop)) {
-            nOffset = binary.find_signature(&memoryMap, nOffset, -1, "'MZ'", nullptr, g_pPdStruct);
-
-            if (nOffset != -1) {
-                nOffset += tryToAddRecord(nOffset, XBinary::FT_PE);
-            } else {
-                break;
-            }
-        }
-
-        XBinary::setPdStructCurrentIncrement(g_pPdStruct, _nFreeIndex);
-    }
-
-    if (g_pData->options.listFileTypes.contains(XBinary::FT_7Z)) {
-        qint64 nOffset = 0;
-
-        while (!(g_pPdStruct->bIsStop)) {
-            nOffset = binary.find_signature(&memoryMap, nOffset, -1, "'7z'BCAF271C", nullptr, g_pPdStruct);
-
-            if (nOffset != -1) {
-                nOffset += tryToAddRecord(nOffset, XBinary::FT_7Z);
-            } else {
-                break;
-            }
-        }
-
-        XBinary::setPdStructCurrentIncrement(g_pPdStruct, _nFreeIndex);
-    }
-
-    if (g_pData->options.listFileTypes.contains(XBinary::FT_DEX)) {
-        qint64 nOffset = 0;
-
-        while (!(g_pPdStruct->bIsStop)) {
-            nOffset = binary.find_signature(&memoryMap, nOffset, -1, "'dex\n'", nullptr, g_pPdStruct);
-
-            if (nOffset != -1) {
-                nOffset += tryToAddRecord(nOffset, XBinary::FT_DEX);
-            } else {
-                break;
-            }
-        }
-
-        XBinary::setPdStructCurrentIncrement(g_pPdStruct, _nFreeIndex);
-    }
-
-    if (g_pData->options.listFileTypes.contains(XBinary::FT_PDF)) {
-        qint64 nOffset = 0;
-
-        while (!(g_pPdStruct->bIsStop)) {
-            nOffset = binary.find_signature(&memoryMap, nOffset, -1, "'%PDF'", nullptr, g_pPdStruct);
-
-            if (nOffset != -1) {
-                nOffset += tryToAddRecord(nOffset, XBinary::FT_PDF);
-            } else {
-                break;
-            }
-        }
-
-        XBinary::setPdStructCurrentIncrement(g_pPdStruct, _nFreeIndex);
-    }
-
-    if (g_pData->options.listFileTypes.contains(XBinary::FT_PNG)) {
-        qint64 nOffset = 0;
-
-        while (!(g_pPdStruct->bIsStop)) {
-            nOffset = binary.find_signature(&memoryMap, nOffset, -1, "89'PNG\r\n'1A0A", nullptr, g_pPdStruct);
-
-            if (nOffset != -1) {
-                nOffset += tryToAddRecord(nOffset, XBinary::FT_PNG);
-            } else {
-                break;
-            }
-        }
-
-        XBinary::setPdStructCurrentIncrement(g_pPdStruct, _nFreeIndex);
-    }
-
-    if (g_pData->options.listFileTypes.contains(XBinary::FT_CAB)) {
-        qint64 nOffset = 0;
-
-        while (!(g_pPdStruct->bIsStop)) {
-            nOffset = binary.find_signature(&memoryMap, nOffset, -1, "'MSCF'", nullptr, g_pPdStruct);
-
-            if (nOffset != -1) {
-                nOffset += tryToAddRecord(nOffset, XBinary::FT_CAB);
-            } else {
-                break;
-            }
-        }
-
-        XBinary::setPdStructCurrentIncrement(g_pPdStruct, _nFreeIndex);
-    }
+    handleSearch(&binary,&memoryMap,XBinary::FT_PE,"'MZ'");
+    handleSearch(&binary,&memoryMap,XBinary::FT_7Z,"'7z'BCAF271C");
+    handleSearch(&binary,&memoryMap,XBinary::FT_DEX,"'dex\n'");
+    handleSearch(&binary,&memoryMap,XBinary::FT_PDF,"'%PDF'");
+    handleSearch(&binary,&memoryMap,XBinary::FT_PNG,"89'PNG\r\n'1A0A");
+    handleSearch(&binary,&memoryMap,XBinary::FT_CAB,"'MSCF'");
+//    handleSearch(&binary,&memoryMap,XBinary::FT_ZIP,"XXX");
+    handleSearch(&binary,&memoryMap,XBinary::FT_ICO,"00000100");
+    handleSearch(&binary,&memoryMap,XBinary::FT_CUR,"00000200");
 
     // TODO more
 
-    XBinary::setPdStructFinished(g_pPdStruct, _nFreeIndex);
+    XBinary::setPdStructFinished(g_pPdStruct, g_nFreeIndex);
 
     emit completed(scanTimer.elapsed());
 }
