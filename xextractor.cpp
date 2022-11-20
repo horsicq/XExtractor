@@ -41,6 +41,7 @@ QList<XBinary::FT> XExtractor::getAvailableFileTypes()
     QList<XBinary::FT> listResult;
 
     listResult.append(XBinary::FT_PE);
+    listResult.append(XBinary::FT_ELF);
     listResult.append(XBinary::FT_ZIP);
     listResult.append(XBinary::FT_PDF);
     listResult.append(XBinary::FT_7Z);
@@ -57,6 +58,7 @@ XExtractor::OPTIONS XExtractor::getDefaultOptions()
     XExtractor::OPTIONS result = {};
 
     result.listFileTypes.append(XBinary::FT_PE);
+    result.listFileTypes.append(XBinary::FT_ELF);
     result.listFileTypes.append(XBinary::FT_ZIP);
     result.listFileTypes.append(XBinary::FT_PDF);
     result.listFileTypes.append(XBinary::FT_7Z);
@@ -156,6 +158,7 @@ void XExtractor::process()
     connect(&binary, SIGNAL(errorMessage(QString)), this, SIGNAL(errorMessage(QString)));
 
     handleSearch(&binary,&memoryMap,XBinary::FT_PE,"'MZ'");
+    handleSearch(&binary,&memoryMap,XBinary::FT_ELF,"7F'ELF'");
     handleSearch(&binary,&memoryMap,XBinary::FT_7Z,"'7z'BCAF271C");
     handleSearch(&binary,&memoryMap,XBinary::FT_DEX,"'dex\n'");
     handleSearch(&binary,&memoryMap,XBinary::FT_PDF,"'%PDF'");
