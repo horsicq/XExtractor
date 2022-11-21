@@ -20,8 +20,7 @@
  */
 #include "xextractor.h"
 
-XExtractor::XExtractor(QObject *pParent)
-    : QObject(pParent)
+XExtractor::XExtractor(QObject *pParent) : QObject(pParent)
 {
     g_pDevice = nullptr;
     g_pData = nullptr;
@@ -46,6 +45,7 @@ QList<XBinary::FT> XExtractor::getAvailableFileTypes()
     listResult.append(XBinary::FT_PDF);
     listResult.append(XBinary::FT_7Z);
     listResult.append(XBinary::FT_PNG);
+    listResult.append(XBinary::FT_JPEG);
     listResult.append(XBinary::FT_CAB);
     listResult.append(XBinary::FT_ICO);
     listResult.append(XBinary::FT_CUR);
@@ -63,6 +63,7 @@ XExtractor::OPTIONS XExtractor::getDefaultOptions()
     result.listFileTypes.append(XBinary::FT_PDF);
     result.listFileTypes.append(XBinary::FT_7Z);
     result.listFileTypes.append(XBinary::FT_PNG);
+    result.listFileTypes.append(XBinary::FT_JPEG);
     result.listFileTypes.append(XBinary::FT_CAB);
     result.listFileTypes.append(XBinary::FT_ICO);
     result.listFileTypes.append(XBinary::FT_CUR);
@@ -108,7 +109,7 @@ qint64 XExtractor::tryToAddRecord(qint64 nOffset, XBinary::FT fileType)
         nResult = 1;
     }
 
-    if ((g_pData->options.bDeepScan) && (fileType!=XBinary::FT_ZIP)) {
+    if ((g_pData->options.bDeepScan) && (fileType != XBinary::FT_ZIP)) {
         nResult = 1;
     }
 
@@ -157,16 +158,17 @@ void XExtractor::process()
 
     connect(&binary, SIGNAL(errorMessage(QString)), this, SIGNAL(errorMessage(QString)));
 
-    handleSearch(&binary,&memoryMap,XBinary::FT_PE,"'MZ'");
-    handleSearch(&binary,&memoryMap,XBinary::FT_ELF,"7F'ELF'");
-    handleSearch(&binary,&memoryMap,XBinary::FT_7Z,"'7z'BCAF271C");
-    handleSearch(&binary,&memoryMap,XBinary::FT_DEX,"'dex\n'");
-    handleSearch(&binary,&memoryMap,XBinary::FT_PDF,"'%PDF'");
-    handleSearch(&binary,&memoryMap,XBinary::FT_PNG,"89'PNG\r\n'1A0A");
-    handleSearch(&binary,&memoryMap,XBinary::FT_CAB,"'MSCF'");
-//    handleSearch(&binary,&memoryMap,XBinary::FT_ZIP,"XXX");
-    handleSearch(&binary,&memoryMap,XBinary::FT_ICO,"00000100");
-    handleSearch(&binary,&memoryMap,XBinary::FT_CUR,"00000200");
+    handleSearch(&binary, &memoryMap, XBinary::FT_PE, "'MZ'");
+    handleSearch(&binary, &memoryMap, XBinary::FT_ELF, "7F'ELF'");
+    handleSearch(&binary, &memoryMap, XBinary::FT_7Z, "'7z'BCAF271C");
+    handleSearch(&binary, &memoryMap, XBinary::FT_DEX, "'dex\n'");
+    handleSearch(&binary, &memoryMap, XBinary::FT_PDF, "'%PDF'");
+    handleSearch(&binary, &memoryMap, XBinary::FT_PNG, "89'PNG\r\n'1A0A");
+    handleSearch(&binary, &memoryMap, XBinary::FT_JPEG, "FFD8FFE0");
+    handleSearch(&binary, &memoryMap, XBinary::FT_CAB, "'MSCF'");
+    //    handleSearch(&binary,&memoryMap,XBinary::FT_ZIP,"XXX");
+    handleSearch(&binary, &memoryMap, XBinary::FT_ICO, "00000100");
+    handleSearch(&binary, &memoryMap, XBinary::FT_CUR, "00000200");
 
     // TODO more
 

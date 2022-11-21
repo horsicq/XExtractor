@@ -55,7 +55,7 @@ public:
 
 private:
     qint64 tryToAddRecord(qint64 nOffset, XBinary::FT fileType);
-    void handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap, XBinary::FT fileType,QString sSignature);
+    void handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap, XBinary::FT fileType, QString sSignature);
 
 signals:
     void errorMessage(QString sText);
