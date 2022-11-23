@@ -111,9 +111,9 @@ qint64 XExtractor::tryToAddRecord(qint64 nOffset, XBinary::FT fileType)
         nResult = 1;
     }
 
-//    if ((g_pData->options.bDeepScan) && (fileType != XBinary::FT_ZIP)) {
-//        nResult = 1;
-//    }
+    //    if ((g_pData->options.bDeepScan) && (fileType != XBinary::FT_ZIP)) {
+    //        nResult = 1;
+    //    }
 
     if (g_pData->options.bDeepScan) {
         nResult = 1;
@@ -168,7 +168,7 @@ void XExtractor::process()
     handleSearch(&binary, &memoryMap, XBinary::FT_ELF, "7F'ELF'");
     handleSearch(&binary, &memoryMap, XBinary::FT_7Z, "'7z'BCAF271C");
     handleSearch(&binary, &memoryMap, XBinary::FT_ZIP, "'PK'0304");
-    handleSearch(&binary, &memoryMap, XBinary::FT_RAR, "'Rar!'1A070100"); // RAR 5
+    handleSearch(&binary, &memoryMap, XBinary::FT_RAR, "'Rar!'1A070100");  // RAR 5
     handleSearch(&binary, &memoryMap, XBinary::FT_DEX, "'dex\n'");
     handleSearch(&binary, &memoryMap, XBinary::FT_PDF, "'%PDF'");
     handleSearch(&binary, &memoryMap, XBinary::FT_PNG, "89'PNG\r\n'1A0A");
@@ -176,7 +176,7 @@ void XExtractor::process()
     handleSearch(&binary, &memoryMap, XBinary::FT_CAB, "'MSCF'");
     //    handleSearch(&binary,&memoryMap,XBinary::FT_ZIP,"XXX");
     handleSearch(&binary, &memoryMap, XBinary::FT_ICO, "00000100");
-    handleSearch(&binary, &memoryMap, XBinary::FT_ICO, "00000200"); // CUR
+    handleSearch(&binary, &memoryMap, XBinary::FT_ICO, "00000200");  // CUR
 
     // TODO more
 
