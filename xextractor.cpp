@@ -82,16 +82,18 @@ qint64 XExtractor::tryToAddRecord(qint64 nOffset, XBinary::FT fileType)
     SubDevice subevice(g_pDevice, nOffset, -1);
 
     if (subevice.open(QIODevice::ReadOnly)) {
-        if (XFormats::isValid(fileType, &subevice)) {
+        XBinary::FILEFORMATINFO formatInfo = XFormats::getFileFormatInfo(fileType, &subevice);
+
+        if (formatInfo.bIsValid) {
             RECORD record = {};
 
             record.nOffset = nOffset;
-            record.nSize = XFormats::getFileFormatSize(fileType, &subevice);
+            record.nSize = formatInfo.nSize;
 
             if (record.nSize) {
-                record.sString = XFormats::getFileFormatString(fileType, &subevice);
-                record.sExt = XFormats::getFileFormatExt(fileType, &subevice);
-                record.fileType = fileType;
+                record.sString = formatInfo.sString;
+                record.sExt = formatInfo.sExt;
+                record.fileType = formatInfo.fileType;
 
                 // Fix if more than the device size
                 if ((record.nOffset + record.nSize) > g_pDevice->size()) {
