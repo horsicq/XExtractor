@@ -41,6 +41,8 @@ QList<XBinary::FT> XExtractor::getAvailableFileTypes()
 
     listResult.append(XBinary::FT_PE);
     listResult.append(XBinary::FT_ELF);
+    listResult.append(XBinary::FT_MACHO);
+    listResult.append(XBinary::FT_MACHOFAT);
     listResult.append(XBinary::FT_ZIP);
     listResult.append(XBinary::FT_RAR);
     listResult.append(XBinary::FT_PDF);
@@ -60,6 +62,8 @@ XExtractor::OPTIONS XExtractor::getDefaultOptions()
 
     result.listFileTypes.append(XBinary::FT_PE);
     result.listFileTypes.append(XBinary::FT_ELF);
+    result.listFileTypes.append(XBinary::FT_MACHO);
+    result.listFileTypes.append(XBinary::FT_MACHOFAT);
     result.listFileTypes.append(XBinary::FT_ZIP);
     result.listFileTypes.append(XBinary::FT_RAR);
     result.listFileTypes.append(XBinary::FT_PDF);
@@ -176,10 +180,14 @@ void XExtractor::process()
     handleSearch(&binary, &memoryMap, XBinary::FT_PNG, "89'PNG\r\n'1A0A");
     handleSearch(&binary, &memoryMap, XBinary::FT_JPEG, "FFD8FFE0");
     handleSearch(&binary, &memoryMap, XBinary::FT_CAB, "'MSCF'");
-    //    handleSearch(&binary,&memoryMap,XBinary::FT_ZIP,"XXX");
     handleSearch(&binary, &memoryMap, XBinary::FT_ICO, "00000100");
     handleSearch(&binary, &memoryMap, XBinary::FT_ICO, "00000200");  // CUR
-
+    handleSearch(&binary, &memoryMap, XBinary::FT_MACHO, "FEEDFACE");
+    handleSearch(&binary, &memoryMap, XBinary::FT_MACHO, "CEFAEDFE");
+    handleSearch(&binary, &memoryMap, XBinary::FT_MACHO, "FEEDFACF");
+    handleSearch(&binary, &memoryMap, XBinary::FT_MACHO, "CFFAEDFE");
+    handleSearch(&binary, &memoryMap, XBinary::FT_MACHOFAT, "CAFEBABE");
+    handleSearch(&binary, &memoryMap, XBinary::FT_MACHOFAT, "BEBAFECA");
     // TODO more
 
     XBinary::setPdStructFinished(g_pPdStruct, g_nFreeIndex);
