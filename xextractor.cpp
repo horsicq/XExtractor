@@ -170,7 +170,7 @@ void XExtractor::process()
     handleSearch(&binary, &memoryMap, XBinary::FT_ELF, "7F'ELF'");
     handleSearch(&binary, &memoryMap, XBinary::FT_7Z, "'7z'BCAF271C");
     handleSearch(&binary, &memoryMap, XBinary::FT_ZIP, "'PK'0304");
-    handleSearch(&binary, &memoryMap, XBinary::FT_RAR, "'Rar!'1A070100");  // RAR 5
+    handleSearch(&binary, &memoryMap, XBinary::FT_RAR, "'Rar!'1A07");
     handleSearch(&binary, &memoryMap, XBinary::FT_DEX, "'dex\n'");
     handleSearch(&binary, &memoryMap, XBinary::FT_PDF, "'%PDF'");
     handleSearch(&binary, &memoryMap, XBinary::FT_PNG, "89'PNG\r\n'1A0A");
