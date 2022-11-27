@@ -189,6 +189,8 @@ void XExtractor::process()
     handleSearch(&binary, &memoryMap, XBinary::FT_MACHOFAT, "CAFEBABE");
     handleSearch(&binary, &memoryMap, XBinary::FT_MACHOFAT, "BEBAFECA");
     // TODO more
+    // BMP
+    // GIF
 
     XBinary::setPdStructFinished(g_pPdStruct, g_nFreeIndex);
 
