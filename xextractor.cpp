@@ -41,17 +41,20 @@ QList<XBinary::FT> XExtractor::getAvailableFileTypes()
 
     listResult.append(XBinary::FT_PE);
     listResult.append(XBinary::FT_ELF);
-    listResult.append(XBinary::FT_MACHO);
     listResult.append(XBinary::FT_MACHOFAT);
-    listResult.append(XBinary::FT_ZIP);
-    listResult.append(XBinary::FT_RAR);
+    listResult.append(XBinary::FT_MACHO);
     listResult.append(XBinary::FT_PDF);
-    listResult.append(XBinary::FT_7Z);
     listResult.append(XBinary::FT_PNG);
     listResult.append(XBinary::FT_JPEG);
-    listResult.append(XBinary::FT_CAB);
+    listResult.append(XBinary::FT_TIFF);
+    listResult.append(XBinary::FT_BMP);
+    listResult.append(XBinary::FT_GIF);
     listResult.append(XBinary::FT_ICO);
     listResult.append(XBinary::FT_DEX);
+    listResult.append(XBinary::FT_ZIP);
+    listResult.append(XBinary::FT_RAR);
+    listResult.append(XBinary::FT_7Z);
+    listResult.append(XBinary::FT_CAB);
 
     return listResult;
 }
@@ -62,14 +65,16 @@ XExtractor::OPTIONS XExtractor::getDefaultOptions()
 
     result.listFileTypes.append(XBinary::FT_PE);
     result.listFileTypes.append(XBinary::FT_ELF);
-    result.listFileTypes.append(XBinary::FT_MACHO);
     result.listFileTypes.append(XBinary::FT_MACHOFAT);
+    result.listFileTypes.append(XBinary::FT_MACHO);
     result.listFileTypes.append(XBinary::FT_ZIP);
     result.listFileTypes.append(XBinary::FT_RAR);
     result.listFileTypes.append(XBinary::FT_PDF);
     result.listFileTypes.append(XBinary::FT_7Z);
     result.listFileTypes.append(XBinary::FT_PNG);
     result.listFileTypes.append(XBinary::FT_JPEG);
+    result.listFileTypes.append(XBinary::FT_BMP);
+    result.listFileTypes.append(XBinary::FT_GIF);
     result.listFileTypes.append(XBinary::FT_CAB);
     result.listFileTypes.append(XBinary::FT_ICO);
     result.listFileTypes.append(XBinary::FT_DEX);
@@ -188,9 +193,11 @@ void XExtractor::process()
     handleSearch(&binary, &memoryMap, XBinary::FT_MACHO, "CFFAEDFE");
     handleSearch(&binary, &memoryMap, XBinary::FT_MACHOFAT, "CAFEBABE");
     handleSearch(&binary, &memoryMap, XBinary::FT_MACHOFAT, "BEBAFECA");
+    handleSearch(&binary, &memoryMap, XBinary::FT_BMP, "'BM'");
+    handleSearch(&binary, &memoryMap, XBinary::FT_GIF, "'GIF8'");
+    handleSearch(&binary, &memoryMap, XBinary::FT_TIFF, "'MM'002A");
+    handleSearch(&binary, &memoryMap, XBinary::FT_TIFF, "'II'2A00");
     // TODO more
-    // BMP
-    // GIF
 
     XBinary::setPdStructFinished(g_pPdStruct, g_nFreeIndex);
 
