@@ -73,7 +73,7 @@ XExtractor::OPTIONS XExtractor::getDefaultOptions()
     result.listFileTypes.append(XBinary::FT_7Z);
     result.listFileTypes.append(XBinary::FT_PNG);
     result.listFileTypes.append(XBinary::FT_JPEG);
-    result.listFileTypes.append(XBinary::FT_TIFF);
+    //result.listFileTypes.append(XBinary::FT_TIFF);
     result.listFileTypes.append(XBinary::FT_BMP);
     result.listFileTypes.append(XBinary::FT_GIF);
     result.listFileTypes.append(XBinary::FT_CAB);
