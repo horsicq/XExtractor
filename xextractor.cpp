@@ -199,6 +199,9 @@ void XExtractor::process()
     handleSearch(&binary, &memoryMap, XBinary::FT_TIFF, "'MM'002A");
     handleSearch(&binary, &memoryMap, XBinary::FT_TIFF, "'II'2A00");
     // TODO more
+    // MP3
+    // MP4
+    // AVI
 
     XBinary::setPdStructFinished(g_pPdStruct, g_nFreeIndex);
 
