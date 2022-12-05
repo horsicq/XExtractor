@@ -200,7 +200,7 @@ void XExtractor::process()
     handleSearch(&binary, &memoryMap, XBinary::FT_GIF, "'GIF8'", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_TIFF, "'MM'002A", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_TIFF, "'II'2A00", 0);
-    handleSearch(&binary, &memoryMap, XBinary::FT_MP4, "ftyp", -4);                 // 000000..'ftyp'
+    handleSearch(&binary, &memoryMap, XBinary::FT_MP4, "'ftyp'", -4);                 // 000000..'ftyp'
     // TODO more
     // MP3
     // AVI
