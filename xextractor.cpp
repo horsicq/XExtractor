@@ -55,6 +55,7 @@ QList<XBinary::FT> XExtractor::getAvailableFileTypes()
     listResult.append(XBinary::FT_RAR);
     listResult.append(XBinary::FT_7Z);
     listResult.append(XBinary::FT_CAB);
+    listResult.append(XBinary::FT_MP4);
 
     return listResult;
 }
@@ -79,6 +80,7 @@ XExtractor::OPTIONS XExtractor::getDefaultOptions()
     result.listFileTypes.append(XBinary::FT_CAB);
     result.listFileTypes.append(XBinary::FT_ICO);
     result.listFileTypes.append(XBinary::FT_DEX);
+    result.listFileTypes.append(XBinary::FT_MP4);
 
     result.bDeepScan = true;
 
@@ -134,7 +136,7 @@ qint64 XExtractor::tryToAddRecord(qint64 nOffset, XBinary::FT fileType)
     return nResult;
 }
 
-void XExtractor::handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap, XBinary::FT fileType, QString sSignature)
+void XExtractor::handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap, XBinary::FT fileType, QString sSignature, qint32 nDelta)
 {
     if (g_pData->options.listFileTypes.contains(fileType)) {
         qint64 nOffset = 0;
@@ -146,7 +148,7 @@ void XExtractor::handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap
             nOffset = pBinary->find_signature(pMemoryMap, nOffset, -1, sSignature, nullptr, g_pPdStruct);
 
             if (nOffset != -1) {
-                nOffset += tryToAddRecord(nOffset, fileType);
+                nOffset += tryToAddRecord(nOffset+nDelta, fileType);
             } else {
                 break;
             }
@@ -176,31 +178,31 @@ void XExtractor::process()
 
     connect(&binary, SIGNAL(errorMessage(QString)), this, SIGNAL(errorMessage(QString)));
 
-    handleSearch(&binary, &memoryMap, XBinary::FT_PE, "'MZ'");
-    handleSearch(&binary, &memoryMap, XBinary::FT_ELF, "7F'ELF'");
-    handleSearch(&binary, &memoryMap, XBinary::FT_7Z, "'7z'BCAF271C");
-    handleSearch(&binary, &memoryMap, XBinary::FT_ZIP, "'PK'0304");
-    handleSearch(&binary, &memoryMap, XBinary::FT_RAR, "'Rar!'1A07");
-    handleSearch(&binary, &memoryMap, XBinary::FT_DEX, "'dex\n'");
-    handleSearch(&binary, &memoryMap, XBinary::FT_PDF, "'%PDF'");
-    handleSearch(&binary, &memoryMap, XBinary::FT_PNG, "89'PNG\r\n'1A0A");
-    handleSearch(&binary, &memoryMap, XBinary::FT_JPEG, "FFD8FF");
-    handleSearch(&binary, &memoryMap, XBinary::FT_CAB, "'MSCF'");
-    handleSearch(&binary, &memoryMap, XBinary::FT_ICO, "00000100");
-    handleSearch(&binary, &memoryMap, XBinary::FT_ICO, "00000200");  // CUR
-    handleSearch(&binary, &memoryMap, XBinary::FT_MACHO, "FEEDFACE");
-    handleSearch(&binary, &memoryMap, XBinary::FT_MACHO, "CEFAEDFE");
-    handleSearch(&binary, &memoryMap, XBinary::FT_MACHO, "FEEDFACF");
-    handleSearch(&binary, &memoryMap, XBinary::FT_MACHO, "CFFAEDFE");
-    handleSearch(&binary, &memoryMap, XBinary::FT_MACHOFAT, "CAFEBABE");
-    handleSearch(&binary, &memoryMap, XBinary::FT_MACHOFAT, "BEBAFECA");
-    handleSearch(&binary, &memoryMap, XBinary::FT_BMP, "'BM'");
-    handleSearch(&binary, &memoryMap, XBinary::FT_GIF, "'GIF8'");
-    handleSearch(&binary, &memoryMap, XBinary::FT_TIFF, "'MM'002A");
-    handleSearch(&binary, &memoryMap, XBinary::FT_TIFF, "'II'2A00");
+    handleSearch(&binary, &memoryMap, XBinary::FT_PE, "'MZ'", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_ELF, "7F'ELF'", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_7Z, "'7z'BCAF271C", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_ZIP, "'PK'0304", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_RAR, "'Rar!'1A07", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_DEX, "'dex\n'", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_PDF, "'%PDF'", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_PNG, "89'PNG\r\n'1A0A", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_JPEG, "FFD8FF", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_CAB, "'MSCF'", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_ICO, "00000100", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_ICO, "00000200", 0);              // CUR
+    handleSearch(&binary, &memoryMap, XBinary::FT_MACHO, "FEEDFACE", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_MACHO, "CEFAEDFE", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_MACHO, "FEEDFACF", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_MACHO, "CFFAEDFE", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_MACHOFAT, "CAFEBABE", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_MACHOFAT, "BEBAFECA", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_BMP, "'BM'", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_GIF, "'GIF8'", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_TIFF, "'MM'002A", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_TIFF, "'II'2A00", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_MP4, "ftyp", -4);                 // 000000..'ftyp'
     // TODO more
     // MP3
-    // MP4
     // AVI
 
     XBinary::setPdStructFinished(g_pPdStruct, g_nFreeIndex);
