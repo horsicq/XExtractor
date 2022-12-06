@@ -55,6 +55,7 @@ QList<XBinary::FT> XExtractor::getAvailableFileTypes()
     listResult.append(XBinary::FT_RAR);
     listResult.append(XBinary::FT_7Z);
     listResult.append(XBinary::FT_CAB);
+    listResult.append(XBinary::FT_MP3);
     listResult.append(XBinary::FT_MP4);
 
     return listResult;
@@ -80,6 +81,7 @@ XExtractor::OPTIONS XExtractor::getDefaultOptions()
     result.listFileTypes.append(XBinary::FT_CAB);
     result.listFileTypes.append(XBinary::FT_ICO);
     result.listFileTypes.append(XBinary::FT_DEX);
+    result.listFileTypes.append(XBinary::FT_MP3);
     result.listFileTypes.append(XBinary::FT_MP4);
 
     result.bDeepScan = true;
@@ -139,6 +141,8 @@ qint64 XExtractor::tryToAddRecord(qint64 nOffset, XBinary::FT fileType)
 void XExtractor::handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap, XBinary::FT fileType, QString sSignature, qint32 nDelta)
 {
     if (g_pData->options.listFileTypes.contains(fileType)) {
+        XBinary::setPdStructStatus(g_pPdStruct, g_nFreeIndex, XBinary::fileTypeIdToString(fileType));
+
         qint64 nOffset = 0;
 
         qint32 _nFreeIndex = XBinary::getFreeIndex(g_pPdStruct);
@@ -200,6 +204,7 @@ void XExtractor::process()
     handleSearch(&binary, &memoryMap, XBinary::FT_GIF, "'GIF8'", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_TIFF, "'MM'002A", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_TIFF, "'II'2A00", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_MP3, "'ID3'", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_MP4, "'ftyp'", -4);                 // 000000..'ftyp'
     // TODO more
     // MP3
