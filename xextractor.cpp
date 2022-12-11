@@ -75,7 +75,7 @@ XExtractor::OPTIONS XExtractor::getDefaultOptions()
     result.listFileTypes.append(XBinary::FT_7Z);
     result.listFileTypes.append(XBinary::FT_PNG);
     result.listFileTypes.append(XBinary::FT_JPEG);
-    //result.listFileTypes.append(XBinary::FT_TIFF);
+    // result.listFileTypes.append(XBinary::FT_TIFF);
     result.listFileTypes.append(XBinary::FT_BMP);
     result.listFileTypes.append(XBinary::FT_GIF);
     result.listFileTypes.append(XBinary::FT_CAB);
@@ -152,7 +152,7 @@ void XExtractor::handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap
             nOffset = pBinary->find_signature(pMemoryMap, nOffset, -1, sSignature, nullptr, g_pPdStruct);
 
             if (nOffset != -1) {
-                nOffset += tryToAddRecord(nOffset+nDelta, fileType);
+                nOffset += tryToAddRecord(nOffset + nDelta, fileType);
             } else {
                 break;
             }
@@ -193,7 +193,7 @@ void XExtractor::process()
     handleSearch(&binary, &memoryMap, XBinary::FT_JPEG, "FFD8FF", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_CAB, "'MSCF'", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_ICO, "00000100", 0);
-    handleSearch(&binary, &memoryMap, XBinary::FT_ICO, "00000200", 0);              // CUR
+    handleSearch(&binary, &memoryMap, XBinary::FT_ICO, "00000200", 0);  // CUR
     handleSearch(&binary, &memoryMap, XBinary::FT_MACHO, "FEEDFACE", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_MACHO, "CEFAEDFE", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_MACHO, "FEEDFACF", 0);
@@ -205,7 +205,7 @@ void XExtractor::process()
     handleSearch(&binary, &memoryMap, XBinary::FT_TIFF, "'MM'002A", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_TIFF, "'II'2A00", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_MP3, "'ID3'", 0);
-    handleSearch(&binary, &memoryMap, XBinary::FT_MP4, "'ftyp'", -4);                 // 000000..'ftyp'
+    handleSearch(&binary, &memoryMap, XBinary::FT_MP4, "'ftyp'", -4);  // 000000..'ftyp'
     // TODO more
     // MP3
     // AVI
