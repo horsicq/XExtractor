@@ -207,8 +207,8 @@ void XExtractor::process()
     handleSearch(&binary, &memoryMap, XBinary::FT_MP3, "'ID3'", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_MP4, "'ftyp'", -4);  // 000000..'ftyp'
     // TODO more
-    // MP3
     // AVI
+    // TIFF
 
     XBinary::setPdStructFinished(g_pPdStruct, g_nFreeIndex);
 
