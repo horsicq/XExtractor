@@ -175,8 +175,30 @@ void XExtractor::process()
 
     g_pData->listRecords.clear();
 
+    qint32 nSearchCount = g_pData->options.listFileTypes.count();
+
+    if (g_pData->options.listFileTypes.contains(XBinary::FT_ICO)) {
+        nSearchCount++;
+    }
+
+    if (g_pData->options.listFileTypes.contains(XBinary::FT_MACHO)) {
+        nSearchCount += 3;
+    }
+
+    if (g_pData->options.listFileTypes.contains(XBinary::FT_MACHOFAT)) {
+        nSearchCount++;
+    }
+
+    if (g_pData->options.listFileTypes.contains(XBinary::FT_TIFF)) {
+        nSearchCount++;
+    }
+
+    if (g_pData->options.listFileTypes.contains(XBinary::FT_RIFF)) {
+        nSearchCount += 2;
+    }
+
     g_nFreeIndex = XBinary::getFreeIndex(g_pPdStruct);
-    XBinary::setPdStructInit(g_pPdStruct, g_nFreeIndex, g_pData->options.listFileTypes.count()); // TODO Fix count
+    XBinary::setPdStructInit(g_pPdStruct, g_nFreeIndex, nSearchCount);
 
     XBinary binary(g_pDevice);
 
@@ -213,6 +235,7 @@ void XExtractor::process()
     handleSearch(&binary, &memoryMap, XBinary::FT_RIFF, "'AIFF'", 0);
     // TODO more
     // TIFF
+    // MP3
 
     XBinary::setPdStructFinished(g_pPdStruct, g_nFreeIndex);
 
