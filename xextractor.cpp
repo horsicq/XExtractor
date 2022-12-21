@@ -57,6 +57,7 @@ QList<XBinary::FT> XExtractor::getAvailableFileTypes()
     listResult.append(XBinary::FT_CAB);
     listResult.append(XBinary::FT_MP3);
     listResult.append(XBinary::FT_MP4);
+    listResult.append(XBinary::FT_RIFF);
 
     return listResult;
 }
@@ -83,6 +84,7 @@ XExtractor::OPTIONS XExtractor::getDefaultOptions()
     result.listFileTypes.append(XBinary::FT_DEX);
     result.listFileTypes.append(XBinary::FT_MP3);
     result.listFileTypes.append(XBinary::FT_MP4);
+    result.listFileTypes.append(XBinary::FT_RIFF);
 
     result.bDeepScan = true;
 
@@ -174,7 +176,7 @@ void XExtractor::process()
     g_pData->listRecords.clear();
 
     g_nFreeIndex = XBinary::getFreeIndex(g_pPdStruct);
-    XBinary::setPdStructInit(g_pPdStruct, g_nFreeIndex, g_pData->options.listFileTypes.count());
+    XBinary::setPdStructInit(g_pPdStruct, g_nFreeIndex, g_pData->options.listFileTypes.count()); // TODO Fix count
 
     XBinary binary(g_pDevice);
 
@@ -206,8 +208,10 @@ void XExtractor::process()
     handleSearch(&binary, &memoryMap, XBinary::FT_TIFF, "'II'2A00", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_MP3, "'ID3'", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_MP4, "'ftyp'", -4);  // 000000..'ftyp'
+    handleSearch(&binary, &memoryMap, XBinary::FT_RIFF, "'RIFF'", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_RIFF, "'RIFX'", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_RIFF, "'AIFF'", 0);
     // TODO more
-    // AVI
     // TIFF
 
     XBinary::setPdStructFinished(g_pPdStruct, g_nFreeIndex);
