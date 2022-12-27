@@ -28,6 +28,7 @@ class XExtractor : public QObject {
 
 public:
     struct OPTIONS {
+        XBinary::FT fileType;
         QList<XBinary::FT> listFileTypes;
         bool bDeepScan;
         bool bMenu_Hex;
@@ -48,6 +49,7 @@ public:
 
     XExtractor(QObject *pParent = nullptr);
 
+    // TODO set init FT
     void setData(QIODevice *pDevice, DATA *pData, XBinary::PDSTRUCT *pPdStruct);
 
     static QList<XBinary::FT> getAvailableFileTypes();
