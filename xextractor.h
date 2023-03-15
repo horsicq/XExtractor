@@ -56,8 +56,7 @@ public:
     static XExtractor::OPTIONS getDefaultOptions();
 
 private:
-    qint64 tryToAddRecord(qint64 nOffset, XBinary::FT fileType);
-    void handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap, XBinary::FT fileType, QString sSignature, qint32 nDelta);
+    void handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap, XBinary::FT fileType, QString sSignature, qint32 nDelta, QVariant varExtra = QVariant(), QString sInfo1 = "", QString sInfo2 = "");
 
 signals:
     void errorMessage(QString sText);
