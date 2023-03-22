@@ -58,7 +58,7 @@ QList<XBinary::FT> XExtractor::getAvailableFileTypes()
     listResult.append(XBinary::FT_MP3);
     listResult.append(XBinary::FT_MP4);
     listResult.append(XBinary::FT_RIFF);
-    listResult.append(XBinary::FT_SIGNATURE);
+    //listResult.append(XBinary::FT_SIGNATURE); // TODO
 
     return listResult;
 }
