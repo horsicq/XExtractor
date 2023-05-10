@@ -94,7 +94,7 @@ XExtractor::OPTIONS XExtractor::getDefaultOptions()
 }
 
 void XExtractor::handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap, XBinary::FT fileType, const QString &sSignature, qint32 nDelta, QVariant varExtra,
-                              QString sInfo, QString sInfo2)
+                              const QString &sInfo, const QString &sInfo2)
 {
     if (g_pData->options.listFileTypes.contains(fileType)) {
         XBinary::setPdStructStatus(g_pPdStruct, g_nFreeIndex, XBinary::fileTypeIdToString(fileType));

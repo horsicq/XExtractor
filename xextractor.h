@@ -57,7 +57,7 @@ public:
 
 private:
     void handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap, XBinary::FT fileType, const QString &sSignature, qint32 nDelta, QVariant varExtra = QVariant(),
-                      QString sInfo1 = "", QString sInfo2 = "");
+                      const QString &sInfo1 = "", const QString &sInfo2 = "");
 
 signals:
     void errorMessage(QString sText);
