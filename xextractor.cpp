@@ -96,6 +96,7 @@ XExtractor::OPTIONS XExtractor::getDefaultOptions()
 void XExtractor::handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap, XBinary::FT fileType, const QString &sSignature, qint32 nDelta, QVariant varExtra,
                               const QString &sInfo, const QString &sInfo2)
 {
+    Q_UNUSED(varExtra)
     Q_UNUSED(sInfo)
     Q_UNUSED(sInfo2)
 
