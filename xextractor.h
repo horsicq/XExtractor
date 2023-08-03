@@ -60,7 +60,7 @@ private:
                       const QString &sInfo1 = "", const QString &sInfo2 = "");
 
 signals:
-    void errorMessage(QString sText);
+    void errorMessage(const QString &sText);
     void completed(qint64 nElapsed);
 
 public slots:
