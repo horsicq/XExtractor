@@ -271,7 +271,7 @@ void XExtractor::process()
 
     XBinary binary(g_pDevice);
 
-    XBinary::_MEMORY_MAP memoryMap = binary.getMemoryMap();
+    XBinary::_MEMORY_MAP memoryMap = binary.getMemoryMap(g_pData->options.mapMode, g_pPdStruct);
 
     connect(&binary, SIGNAL(errorMessage(QString)), this, SIGNAL(errorMessage(QString)));
 
