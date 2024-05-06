@@ -32,6 +32,7 @@ public:
         XBinary::MAPMODE mapMode;
         QList<XBinary::FT> listFileTypes;
         bool bDeepScan;
+        bool bHeuristicScan;
         bool bMenu_Hex;
     };
 

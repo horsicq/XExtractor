@@ -53,6 +53,7 @@ QList<XBinary::FT> XExtractor::getAvailableFileTypes()
     listResult.append(XBinary::FT_DEX);
     listResult.append(XBinary::FT_ZIP);
     listResult.append(XBinary::FT_RAR);
+    listResult.append(XBinary::FT_GZIP);
     listResult.append(XBinary::FT_7Z);
     listResult.append(XBinary::FT_CAB);
     listResult.append(XBinary::FT_MP3);
@@ -73,6 +74,7 @@ XExtractor::OPTIONS XExtractor::getDefaultOptions()
     result.listFileTypes.append(XBinary::FT_MACHO);
     result.listFileTypes.append(XBinary::FT_ZIP);
     result.listFileTypes.append(XBinary::FT_RAR);
+    result.listFileTypes.append(XBinary::FT_GZIP);
     result.listFileTypes.append(XBinary::FT_PDF);
     result.listFileTypes.append(XBinary::FT_7Z);
     result.listFileTypes.append(XBinary::FT_PNG);
@@ -89,6 +91,7 @@ XExtractor::OPTIONS XExtractor::getDefaultOptions()
     // result.listFileTypes.append(XBinary::FT_SIGNATURE);
 
     result.bDeepScan = true;
+    result.bHeuristicScan = true;
 
     return result;
 }
@@ -177,12 +180,23 @@ void XExtractor::handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap
                 } else {
                     qint64 nResSize = 0;
 
-                    SubDevice subevice(g_pDevice, _nOffset, -1);
+                    SubDevice subdevice(g_pDevice, _nOffset, -1);
 
-                    if (subevice.open(QIODevice::ReadOnly)) {
-                        XBinary::FILEFORMATINFO formatInfo = XFormats::getFileFormatInfo(fileType, &subevice);
+                    if (subdevice.open(QIODevice::ReadOnly)) {
+                        XBinary::FILEFORMATINFO formatInfo = XFormats::getFileFormatInfo(fileType, &subdevice);
 
                         if (formatInfo.bIsValid) {
+                            if (g_pData->options.bHeuristicScan) {
+                                QSet<XBinary::FT> stFT = XFormats::getFileTypes(&subdevice, true, g_pPdStruct);
+                                XBinary::FT _fileType = XBinary::_getPrefFileType(&stFT);
+
+                                XBinary::FILEFORMATINFO _formatInfo = XFormats::getFileFormatInfo(_fileType, &subdevice);
+
+                                if (_formatInfo.bIsValid) {
+                                    formatInfo = _formatInfo;
+                                }
+                            }
+
                             RECORD record = {};
 
                             record.nOffset = _nOffset;
@@ -204,7 +218,7 @@ void XExtractor::handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap
                             nResSize = record.nSize;
                         }
 
-                        subevice.close();
+                        subdevice.close();
                     }
 
                     if (nResSize == 0) {
@@ -280,6 +294,7 @@ void XExtractor::process()
     handleSearch(&binary, &memoryMap, XBinary::FT_7Z, "'7z'BCAF271C", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_ZIP, "'PK'0304", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_RAR, "'Rar!'1A07", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_GZIP, "1F8B08", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_DEX, "'dex\n'", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_PDF, "'%PDF'", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_PNG, "89'PNG\r\n'1A0A", 0);
