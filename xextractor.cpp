@@ -183,14 +183,14 @@ void XExtractor::handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap
                     SubDevice subdevice(g_pDevice, _nOffset, -1);
 
                     if (subdevice.open(QIODevice::ReadOnly)) {
-                        XBinary::FILEFORMATINFO formatInfo = XFormats::getFileFormatInfo(fileType, &subdevice);
+                        XBinary::FILEFORMATINFO formatInfo = XFormats::getFileFormatInfo(fileType, &subdevice, false, -1, g_pPdStruct);
 
                         if (formatInfo.bIsValid) {
                             if (g_pData->options.bHeuristicScan) {
                                 QSet<XBinary::FT> stFT = XFormats::getFileTypes(&subdevice, true, g_pPdStruct);
                                 XBinary::FT _fileType = XBinary::_getPrefFileType(&stFT);
 
-                                XBinary::FILEFORMATINFO _formatInfo = XFormats::getFileFormatInfo(_fileType, &subdevice);
+                                XBinary::FILEFORMATINFO _formatInfo = XFormats::getFileFormatInfo(_fileType, &subdevice, false, -1, g_pPdStruct);
 
                                 if (_formatInfo.bIsValid) {
                                     formatInfo = _formatInfo;
