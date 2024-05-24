@@ -54,6 +54,7 @@ QList<XBinary::FT> XExtractor::getAvailableFileTypes()
     listResult.append(XBinary::FT_ZIP);
     listResult.append(XBinary::FT_RAR);
     listResult.append(XBinary::FT_GZIP);
+    listResult.append(XBinary::FT_ZLIB);
     listResult.append(XBinary::FT_7Z);
     listResult.append(XBinary::FT_CAB);
     listResult.append(XBinary::FT_MP3);
@@ -75,6 +76,7 @@ XExtractor::OPTIONS XExtractor::getDefaultOptions()
     result.listFileTypes.append(XBinary::FT_ZIP);
     result.listFileTypes.append(XBinary::FT_RAR);
     result.listFileTypes.append(XBinary::FT_GZIP);
+    result.listFileTypes.append(XBinary::FT_ZLIB);
     result.listFileTypes.append(XBinary::FT_PDF);
     result.listFileTypes.append(XBinary::FT_7Z);
     result.listFileTypes.append(XBinary::FT_PNG);
@@ -94,6 +96,18 @@ XExtractor::OPTIONS XExtractor::getDefaultOptions()
     result.bHeuristicScan = true;
 
     return result;
+}
+
+QList<XExtractor::RECORD> XExtractor::scanDevice(QIODevice *pDevice, OPTIONS options, XBinary::PDSTRUCT *pPdStruct)
+{
+    DATA _data = {};
+    _data.options = options;
+
+    XExtractor _extractor;
+    _extractor.setData(pDevice, &_data, pPdStruct);
+    _extractor.process();
+
+    return _data.listRecords;
 }
 
 void XExtractor::handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap, XBinary::FT fileType, const QString &sSignature, qint32 nDelta, QVariant varExtra,
@@ -295,6 +309,9 @@ void XExtractor::process()
     handleSearch(&binary, &memoryMap, XBinary::FT_ZIP, "'PK'0304", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_RAR, "'Rar!'1A07", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_GZIP, "1F8B08", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_ZLIB, "785E", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_ZLIB, "789C", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_ZLIB, "78DA", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_DEX, "'dex\n'", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_PDF, "'%PDF'", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_PNG, "89'PNG\r\n'1A0A", 0);

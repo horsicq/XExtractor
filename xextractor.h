@@ -56,6 +56,7 @@ public:
 
     static QList<XBinary::FT> getAvailableFileTypes();
     static XExtractor::OPTIONS getDefaultOptions();
+    static QList<RECORD> scanDevice(QIODevice *pDevice, OPTIONS options, XBinary::PDSTRUCT *pPdStruct);
 
 private:
     void handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap, XBinary::FT fileType, const QString &sSignature, qint32 nDelta, QVariant varExtra = QVariant(),
