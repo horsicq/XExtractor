@@ -33,7 +33,7 @@ public:
         QList<XBinary::FT> listFileTypes;
         bool bDeepScan;
         bool bHeuristicScan;
-        bool bMenu_Hex; // For Widget
+        bool bMenu_Hex;  // For Widget
     };
 
     struct RECORD {
