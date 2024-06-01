@@ -318,7 +318,7 @@ void XExtractor::process()
     handleSearch(&binary, &memoryMap, XBinary::FT_JPEG, "FFD8FF", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_CAB, "'MSCF'", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_ICO, "00000100", 0);
-    handleSearch(&binary, &memoryMap, XBinary::FT_ICO, "00000200", 0);  // CUR
+    handleSearch(&binary, &memoryMap, XBinary::FT_CUR, "00000200", 0);  // CUR
     handleSearch(&binary, &memoryMap, XBinary::FT_MACHO, "FEEDFACE", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_MACHO, "CEFAEDFE", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_MACHO, "FEEDFACF", 0);
