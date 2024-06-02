@@ -50,6 +50,7 @@ QList<XBinary::FT> XExtractor::getAvailableFileTypes()
     listResult.append(XBinary::FT_BMP);
     listResult.append(XBinary::FT_GIF);
     listResult.append(XBinary::FT_ICO);
+    listResult.append(XBinary::FT_CUR);
     listResult.append(XBinary::FT_DEX);
     listResult.append(XBinary::FT_ZIP);
     listResult.append(XBinary::FT_RAR);
@@ -85,7 +86,7 @@ XExtractor::OPTIONS XExtractor::getDefaultOptions()
     result.listFileTypes.append(XBinary::FT_BMP);
     result.listFileTypes.append(XBinary::FT_GIF);
     result.listFileTypes.append(XBinary::FT_CAB);
-    result.listFileTypes.append(XBinary::FT_ICO);
+//    result.listFileTypes.append(XBinary::FT_ICO);
     result.listFileTypes.append(XBinary::FT_DEX);
     result.listFileTypes.append(XBinary::FT_MP3);
     result.listFileTypes.append(XBinary::FT_MP4);
