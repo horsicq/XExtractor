@@ -86,7 +86,7 @@ XExtractor::OPTIONS XExtractor::getDefaultOptions()
     result.listFileTypes.append(XBinary::FT_BMP);
     result.listFileTypes.append(XBinary::FT_GIF);
     result.listFileTypes.append(XBinary::FT_CAB);
-//    result.listFileTypes.append(XBinary::FT_ICO);
+    //    result.listFileTypes.append(XBinary::FT_ICO);
     result.listFileTypes.append(XBinary::FT_DEX);
     result.listFileTypes.append(XBinary::FT_MP3);
     result.listFileTypes.append(XBinary::FT_MP4);
