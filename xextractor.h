@@ -51,7 +51,6 @@ public:
 
     XExtractor(QObject *pParent = nullptr);
 
-    // TODO set init FT Check
     void setData(QIODevice *pDevice, DATA *pData, XBinary::PDSTRUCT *pPdStruct);
 
     static QList<XBinary::FT> getAvailableFileTypes();
