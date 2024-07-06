@@ -295,7 +295,6 @@ void XExtractor::process()
         nSearchCount += 2;
     }
 
-
     // TODO signatures
 
     g_nFreeIndex = XBinary::getFreeIndex(g_pPdStruct);
