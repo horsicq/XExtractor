@@ -63,6 +63,7 @@ QList<XBinary::FT> XExtractor::getAvailableFileTypes()
     listResult.append(XBinary::FT_RIFF);
     listResult.append(XBinary::FT_LE);
     listResult.append(XBinary::FT_NE);
+    listResult.append(XBinary::FT_AMIGAHUNK);
     // listResult.append(XBinary::FT_SIGNATURE); // TODO
 
     return listResult;
@@ -295,6 +296,10 @@ void XExtractor::process()
         nSearchCount += 2;
     }
 
+    if (g_pData->options.listFileTypes.contains(XBinary::FT_AMIGAHUNK)) {
+        nSearchCount += 2;
+    }
+
     // TODO signatures
 
     g_nFreeIndex = XBinary::getFreeIndex(g_pPdStruct);
@@ -339,6 +344,8 @@ void XExtractor::process()
     handleSearch(&binary, &memoryMap, XBinary::FT_RIFF, "'AIFF'", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_NE, "'MZ'", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_LE, "'MZ'", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_AMIGAHUNK, "000003F3", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_AMIGAHUNK, "000003E7", 0);
 
     // TODO LE/BE
     handleSearch(&binary, &memoryMap, XBinary::FT_SIGNATURE, "00000000", -4, 0, "CRC32", "Test");
