@@ -292,9 +292,9 @@ void XExtractor::process()
         nSearchCount++;
     }
 
-    if (g_pData->options.listFileTypes.contains(XBinary::FT_RIFF)) {
-        nSearchCount += 2;
-    }
+    // if (g_pData->options.listFileTypes.contains(XBinary::FT_RIFF)) {
+    //     nSearchCount += 2;
+    // }
 
     if (g_pData->options.listFileTypes.contains(XBinary::FT_AMIGAHUNK)) {
         nSearchCount += 2;
@@ -340,8 +340,8 @@ void XExtractor::process()
     handleSearch(&binary, &memoryMap, XBinary::FT_MP3, "'ID3'", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_MP4, "'ftyp'", -4);  // 000000..'ftyp'
     handleSearch(&binary, &memoryMap, XBinary::FT_RIFF, "'RIFF'", 0);
-    handleSearch(&binary, &memoryMap, XBinary::FT_RIFF, "'RIFX'", 0);
-    handleSearch(&binary, &memoryMap, XBinary::FT_RIFF, "'AIFF'", 0);
+    // handleSearch(&binary, &memoryMap, XBinary::FT_RIFF, "'RIFX'", 0);
+    // handleSearch(&binary, &memoryMap, XBinary::FT_RIFF, "'AIFF'", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_NE, "'MZ'", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_LE, "'MZ'", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_AMIGAHUNK, "000003F3", 0);
