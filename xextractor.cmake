@@ -7,7 +7,6 @@ endif()
 
 set(XEXTRACTOR_SOURCES
     ${XEXTRACTOR_SOURCES}
-    ${XFORMATS_SOURCES}
     ${CMAKE_CURRENT_LIST_DIR}/xextractor.cpp
     ${CMAKE_CURRENT_LIST_DIR}/xextractor.h
 )
