@@ -102,7 +102,7 @@ XExtractor::OPTIONS XExtractor::getDefaultOptions()
     return result;
 }
 
-QList<XExtractor::RECORD> XExtractor::scanDevice(QIODevice *pDevice, OPTIONS options, XBinary::PDSTRUCT *pPdStruct)
+QVector<XExtractor::RECORD> XExtractor::scanDevice(QIODevice *pDevice, OPTIONS options, XBinary::PDSTRUCT *pPdStruct)
 {
     DATA _data = {};
     _data.options = options;
