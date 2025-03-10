@@ -64,6 +64,7 @@ QList<XBinary::FT> XExtractor::getAvailableFileTypes()
     listResult.append(XBinary::FT_LE);
     listResult.append(XBinary::FT_NE);
     listResult.append(XBinary::FT_AMIGAHUNK);
+    listResult.append(XBinary::FT_JAVACLASS);
     // listResult.append(XBinary::FT_SIGNATURE); // TODO
 
     return listResult;
@@ -346,6 +347,7 @@ void XExtractor::process()
     handleSearch(&binary, &memoryMap, XBinary::FT_LE, "'MZ'", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_AMIGAHUNK, "000003F3", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_AMIGAHUNK, "000003E7", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_JAVACLASS, "CAFEBABE", 0);
 
     // TODO LE/BE
     handleSearch(&binary, &memoryMap, XBinary::FT_SIGNATURE, "00000000", -4, 0, "CRC32", "Test");
