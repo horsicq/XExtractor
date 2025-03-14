@@ -130,6 +130,8 @@ void XExtractor::handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap
         qint32 _nFreeIndex = XBinary::getFreeIndex(g_pPdStruct);
         XBinary::setPdStructInit(g_pPdStruct, _nFreeIndex, pBinary->getSize());
 
+        qint32 nFound = 0;
+
         while (!(g_pPdStruct->bIsStop)) {
             nOffset = pBinary->find_signature(pMemoryMap, nOffset, -1, sSignature, nullptr, g_pPdStruct);
 
@@ -232,6 +234,8 @@ void XExtractor::handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap
                                 }
 
                                 g_pData->listRecords.append(record);
+
+                                nFound++;
                             }
 
                             nResSize = record.nSize;
@@ -256,6 +260,10 @@ void XExtractor::handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap
                 }
 
             } else {
+                break;
+            }
+
+            if ((g_pData->options.nLimit > 0) && (nFound >= g_pData->options.nLimit)) {
                 break;
             }
 

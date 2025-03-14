@@ -31,6 +31,7 @@ public:
         XBinary::FT fileType;
         XBinary::MAPMODE mapMode;
         QList<XBinary::FT> listFileTypes;
+        qint32 nLimit;
         bool bDeepScan;
         bool bHeuristicScan;
         bool bMenu_Hex;  // For Widget
