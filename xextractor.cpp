@@ -224,7 +224,7 @@ void XExtractor::handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap
                             record.nSize = formatInfo.nSize;
 
                             if (record.nSize) {
-                                record.sString = formatInfo.sString;
+                                record.sString = XBinary::getFileFormatString(&formatInfo);
                                 record.sExt = formatInfo.sExt;
                                 record.fileType = formatInfo.fileType;
 
