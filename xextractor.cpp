@@ -132,7 +132,7 @@ void XExtractor::handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap
 
         qint32 nFound = 0;
 
-        while (!(g_pPdStruct->bIsStop)) {
+        while (XBinary::isPdStructNotCanceled(g_pPdStruct)) {
             nOffset = pBinary->find_signature(pMemoryMap, nOffset, -1, sSignature, nullptr, g_pPdStruct);
 
             if (nOffset != -1) {
