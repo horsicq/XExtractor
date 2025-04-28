@@ -95,6 +95,10 @@ XExtractor::OPTIONS XExtractor::getDefaultOptions()
     result.listFileTypes.append(XBinary::FT_MP3);
     result.listFileTypes.append(XBinary::FT_MP4);
     result.listFileTypes.append(XBinary::FT_RIFF);
+    // result.listFileTypes.append(XBinary::FT_LE);
+    // result.listFileTypes.append(XBinary::FT_NE);
+    // result.listFileTypes.append(XBinary::FT_AMIGAHUNK);
+    // result.listFileTypes.append(XBinary::FT_JAVACLASS);
     // result.listFileTypes.append(XBinary::FT_SIGNATURE);
 
     result.bDeepScan = true;
@@ -271,7 +275,6 @@ void XExtractor::handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap
         }
 
         XBinary::setPdStructFinished(g_pPdStruct, _nFreeIndex);
-
         XBinary::setPdStructCurrentIncrement(g_pPdStruct, g_nFreeIndex);
     }
 }
