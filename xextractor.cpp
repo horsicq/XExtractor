@@ -65,6 +65,7 @@ QList<XBinary::FT> XExtractor::getAvailableFileTypes()
     listResult.append(XBinary::FT_NE);
     listResult.append(XBinary::FT_AMIGAHUNK);
     listResult.append(XBinary::FT_JAVACLASS);
+    // listResult.append(XBinary::FT_CFBF);
     // listResult.append(XBinary::FT_SIGNATURE); // TODO
 
     return listResult;
