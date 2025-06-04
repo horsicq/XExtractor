@@ -212,11 +212,13 @@ void XExtractor::handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap
                         XBinary::FILEFORMATINFO formatInfo = XFormats::getFileFormatInfo(fileType, &subdevice, false, -1, g_pPdStruct);
 
                         if (formatInfo.bIsValid) {
+                            qint64 nFileFormatSize = 0;
                             if (g_pData->options.bHeuristicScan) {
                                 QSet<XBinary::FT> stFT = XFormats::getFileTypes(&subdevice, true, g_pPdStruct);
                                 XBinary::FT _fileType = XBinary::_getPrefFileType(&stFT);
 
                                 XBinary::FILEFORMATINFO _formatInfo = XFormats::getFileFormatInfo(_fileType, &subdevice, false, -1, g_pPdStruct);
+                                nFileFormatSize = XFormats::getFileFormatSize(_fileType, &subdevice, false, -1, g_pPdStruct);;
 
                                 if (_formatInfo.bIsValid) {
                                     formatInfo = _formatInfo;
@@ -226,7 +228,7 @@ void XExtractor::handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap
                             RECORD record = {};
 
                             record.nOffset = _nOffset;
-                            record.nSize = formatInfo.nSize;
+                            record.nSize = nFileFormatSize;
 
                             if (record.nSize) {
                                 record.sString = XBinary::getFileFormatString(&formatInfo);
