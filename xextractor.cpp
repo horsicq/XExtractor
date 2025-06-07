@@ -218,7 +218,8 @@ void XExtractor::handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap
                                 XBinary::FT _fileType = XBinary::_getPrefFileType(&stFT);
 
                                 XBinary::FILEFORMATINFO _formatInfo = XFormats::getFileFormatInfo(_fileType, &subdevice, false, -1, g_pPdStruct);
-                                nFileFormatSize = XFormats::getFileFormatSize(_fileType, &subdevice, false, -1, g_pPdStruct);;
+                                nFileFormatSize = XFormats::getFileFormatSize(_fileType, &subdevice, false, -1, g_pPdStruct);
+                                ;
 
                                 if (_formatInfo.bIsValid) {
                                     formatInfo = _formatInfo;
