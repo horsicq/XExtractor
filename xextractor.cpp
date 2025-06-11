@@ -50,7 +50,6 @@ QList<XBinary::FT> XExtractor::getAvailableFileTypes()
     listResult.append(XBinary::FT_BMP);
     listResult.append(XBinary::FT_GIF);
     listResult.append(XBinary::FT_ICO);
-    listResult.append(XBinary::FT_CUR);
     listResult.append(XBinary::FT_DEX);
     listResult.append(XBinary::FT_ZIP);
     listResult.append(XBinary::FT_RAR);
@@ -65,6 +64,7 @@ QList<XBinary::FT> XExtractor::getAvailableFileTypes()
     listResult.append(XBinary::FT_NE);
     listResult.append(XBinary::FT_AMIGAHUNK);
     listResult.append(XBinary::FT_JAVACLASS);
+    listResult.append(XBinary::FT_SZDD);
     // listResult.append(XBinary::FT_CFBF);
     // listResult.append(XBinary::FT_SIGNATURE); // TODO
 
@@ -363,6 +363,7 @@ void XExtractor::process()
     handleSearch(&binary, &memoryMap, XBinary::FT_AMIGAHUNK, "000003F3", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_AMIGAHUNK, "000003E7", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_JAVACLASS, "CAFEBABE", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_SZDD, "'SZDD'88F027'3A'", 0);
 
     // TODO LE/BE
     handleSearch(&binary, &memoryMap, XBinary::FT_SIGNATURE, "00000000", -4, 0, "CRC32", "Test");
