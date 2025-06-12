@@ -20,7 +20,7 @@
  */
 #include "xextractor.h"
 
-XExtractor::XExtractor(QObject *pParent) : QObject(pParent)
+XExtractor::XExtractor(QObject *pParent) : XThreadObject(pParent)
 {
     g_pDevice = nullptr;
     g_pData = nullptr;

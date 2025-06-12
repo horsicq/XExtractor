@@ -22,8 +22,9 @@
 #define XEXTRACTOR_H
 
 #include "xformats.h"
+#include "xthreadobject.h"
 
-class XExtractor : public QObject {
+class XExtractor : public XThreadObject {
     Q_OBJECT
 
 public:
@@ -61,11 +62,6 @@ public:
 private:
     void handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap, XBinary::FT fileType, const QString &sSignature, qint32 nDelta, QVariant varExtra = QVariant(),
                       const QString &sInfo1 = "", const QString &sInfo2 = "");
-
-signals:
-    void errorMessage(const QString &sText);
-    void completed(qint64 nElapsed);
-
 public slots:
     void process();
 
