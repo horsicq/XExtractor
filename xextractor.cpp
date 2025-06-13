@@ -65,6 +65,7 @@ QList<XBinary::FT> XExtractor::getAvailableFileTypes()
     listResult.append(XBinary::FT_AMIGAHUNK);
     listResult.append(XBinary::FT_JAVACLASS);
     listResult.append(XBinary::FT_SZDD);
+    listResult.append(XBinary::FT_LHA);
     // listResult.append(XBinary::FT_CFBF);
     // listResult.append(XBinary::FT_SIGNATURE); // TODO
 
@@ -129,6 +130,11 @@ void XExtractor::handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap
 
     if (g_pData->options.listFileTypes.contains(fileType)) {
         XBinary::setPdStructStatus(g_pPdStruct, g_nFreeIndex, XBinary::fileTypeIdToString(fileType));
+
+        bool bNextByte = true;
+        if (fileType == XBinary::FT_LHA) {
+            bNextByte = false;
+        }
 
         qint64 nOffset = 0;
 
@@ -261,7 +267,9 @@ void XExtractor::handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap
                     //    }
 
                     if (g_pData->options.bDeepScan) {
-                        nResSize = 1;
+                        if (bNextByte) {
+                            nResSize = 1;
+                        }
                     }
 
                     nOffset += nResSize;
@@ -313,6 +321,10 @@ void XExtractor::process()
     // }
 
     if (g_pData->options.listFileTypes.contains(XBinary::FT_AMIGAHUNK)) {
+        nSearchCount++;
+    }
+
+    if (g_pData->options.listFileTypes.contains(XBinary::FT_LHA)) {
         nSearchCount += 2;
     }
 
@@ -364,6 +376,9 @@ void XExtractor::process()
     handleSearch(&binary, &memoryMap, XBinary::FT_AMIGAHUNK, "000003E7", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_JAVACLASS, "CAFEBABE", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_SZDD, "'SZDD'88F027'3A'", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_LHA, "'-lh'..2d'", -2); // "....'-lh'..2d"
+    handleSearch(&binary, &memoryMap, XBinary::FT_LHA, "'-lz'..2d'", -2);
+    handleSearch(&binary, &memoryMap, XBinary::FT_LHA, "'-pm'..2d'", -2);
 
     // TODO LE/BE
     handleSearch(&binary, &memoryMap, XBinary::FT_SIGNATURE, "00000000", -4, 0, "CRC32", "Test");
