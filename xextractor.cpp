@@ -65,6 +65,7 @@ QList<XBinary::FT> XExtractor::getAvailableFileTypes()
     listResult.append(XBinary::FT_AMIGAHUNK);
     listResult.append(XBinary::FT_JAVACLASS);
     listResult.append(XBinary::FT_SZDD);
+    listResult.append(XBinary::FT_BZIP2);
     listResult.append(XBinary::FT_LHA);
     // listResult.append(XBinary::FT_CFBF);
     // listResult.append(XBinary::FT_SIGNATURE); // TODO
@@ -328,6 +329,10 @@ void XExtractor::process()
         nSearchCount += 2;
     }
 
+    if (g_pData->options.listFileTypes.contains(XBinary::FT_BZIP2)) {
+        nSearchCount++;
+    }
+
     // TODO signatures
 
     g_nFreeIndex = XBinary::getFreeIndex(g_pPdStruct);
@@ -379,6 +384,8 @@ void XExtractor::process()
     handleSearch(&binary, &memoryMap, XBinary::FT_LHA, "'-lh'..2d'", -2); // "....'-lh'..2d"
     handleSearch(&binary, &memoryMap, XBinary::FT_LHA, "'-lz'..2d'", -2);
     handleSearch(&binary, &memoryMap, XBinary::FT_LHA, "'-pm'..2d'", -2);
+    handleSearch(&binary, &memoryMap, XBinary::FT_BZIP2, "314159265359", -4);
+    handleSearch(&binary, &memoryMap, XBinary::FT_BZIP2, "17724538509000000000", -4); // Empty
 
     // TODO LE/BE
     handleSearch(&binary, &memoryMap, XBinary::FT_SIGNATURE, "00000000", -4, 0, "CRC32", "Test");
