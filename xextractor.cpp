@@ -381,11 +381,11 @@ void XExtractor::process()
     handleSearch(&binary, &memoryMap, XBinary::FT_AMIGAHUNK, "000003E7", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_JAVACLASS, "CAFEBABE", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_SZDD, "'SZDD'88F027'3A'", 0);
-    handleSearch(&binary, &memoryMap, XBinary::FT_LHA, "'-lh'..2d'", -2); // "....'-lh'..2d"
+    handleSearch(&binary, &memoryMap, XBinary::FT_LHA, "'-lh'..2d'", -2);  // "....'-lh'..2d"
     handleSearch(&binary, &memoryMap, XBinary::FT_LHA, "'-lz'..2d'", -2);
     handleSearch(&binary, &memoryMap, XBinary::FT_LHA, "'-pm'..2d'", -2);
     handleSearch(&binary, &memoryMap, XBinary::FT_BZIP2, "314159265359", -4);
-    handleSearch(&binary, &memoryMap, XBinary::FT_BZIP2, "17724538509000000000", -4); // Empty
+    handleSearch(&binary, &memoryMap, XBinary::FT_BZIP2, "17724538509000000000", -4);  // Empty
 
     // TODO LE/BE
     handleSearch(&binary, &memoryMap, XBinary::FT_SIGNATURE, "00000000", -4, 0, "CRC32", "Test");
