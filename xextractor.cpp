@@ -133,6 +133,7 @@ void XExtractor::handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap
         XBinary::setPdStructStatus(g_pPdStruct, g_nFreeIndex, XBinary::fileTypeIdToString(fileType));
 
         bool bNextByte = true;
+        // mb TODO all archives!
         if (fileType == XBinary::FT_LHA) {
             bNextByte = false;
         }
