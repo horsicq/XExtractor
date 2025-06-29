@@ -67,6 +67,7 @@ QList<XBinary::FT> XExtractor::getAvailableFileTypes()
     listResult.append(XBinary::FT_SZDD);
     listResult.append(XBinary::FT_BZIP2);
     listResult.append(XBinary::FT_LHA);
+    listResult.append(XBinary::FT_DJVU);
     // listResult.append(XBinary::FT_CFBF);
     // listResult.append(XBinary::FT_SIGNATURE); // TODO
 
@@ -326,6 +327,10 @@ void XExtractor::process()
         nSearchCount++;
     }
 
+    if (g_pData->options.listFileTypes.contains(XBinary::FT_DJVU)) {
+        nSearchCount++;
+    }
+
     if (g_pData->options.listFileTypes.contains(XBinary::FT_LHA)) {
         nSearchCount += 2;
     }
@@ -381,6 +386,8 @@ void XExtractor::process()
     handleSearch(&binary, &memoryMap, XBinary::FT_AMIGAHUNK, "000003F3", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_AMIGAHUNK, "000003E7", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_JAVACLASS, "CAFEBABE", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_DJVU, "'AT&TFORM'", 0);
+    handleSearch(&binary, &memoryMap, XBinary::FT_DJVU, "'SDJVFORM'", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_SZDD, "'SZDD'88F027'3A'", 0);
     handleSearch(&binary, &memoryMap, XBinary::FT_LHA, "'-lh'..2d'", -2);  // "....'-lh'..2d"
     handleSearch(&binary, &memoryMap, XBinary::FT_LHA, "'-lz'..2d'", -2);
