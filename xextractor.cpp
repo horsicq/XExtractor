@@ -296,9 +296,6 @@ void XExtractor::handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap
 
 void XExtractor::process()
 {
-    QElapsedTimer scanTimer;
-    scanTimer.start();
-
     g_pData->listRecords.clear();
 
     qint32 nSearchCount = g_pData->options.listFileTypes.count();
@@ -400,6 +397,4 @@ void XExtractor::process()
     // TODO more
 
     XBinary::setPdStructFinished(g_pPdStruct, g_nFreeIndex);
-
-    emit completed(scanTimer.elapsed());
 }
