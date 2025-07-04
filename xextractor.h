@@ -34,8 +34,12 @@ public:
         QList<XBinary::FT> listFileTypes;
         qint32 nLimit;
         bool bDeepScan;
-        bool bHeuristicScan;
-        bool bMenu_Hex;  // For Widget
+        XBinary::EMODE emode;  // RAW, FORMAT, HEURISTIC
+        // bool bHeuristicScan;
+        bool bAnalyze;
+        bool bExtract;
+        bool bMenu_Hex;
+        QString sOutputDirectory;
     };
 
     struct RECORD {
