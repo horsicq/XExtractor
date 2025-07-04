@@ -293,7 +293,7 @@ void XExtractor::handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap
 
 void XExtractor::process()
 {
-    if(g_pData->options.bAnalyze) {
+    if (g_pData->options.bAnalyze) {
         g_pData->listRecords.clear();
 
         qint32 nSearchCount = g_pData->options.listFileTypes.count();
