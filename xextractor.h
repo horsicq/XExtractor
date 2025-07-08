@@ -23,6 +23,7 @@
 
 #include "xformats.h"
 #include "xthreadobject.h"
+#include <QAbstractItemModel>
 
 class XExtractor : public XThreadObject {
     Q_OBJECT
@@ -52,6 +53,7 @@ public:
 
     struct DATA {
         OPTIONS options;
+        XBinary::_MEMORY_MAP memoryMap;
         QVector<RECORD> listRecords;
     };
 
@@ -62,6 +64,8 @@ public:
     static QList<XBinary::FT> getAvailableFileTypes();
     static XExtractor::OPTIONS getDefaultOptions();
     static QVector<RECORD> scanDevice(QIODevice *pDevice, OPTIONS options, XBinary::PDSTRUCT *pPdStruct);
+
+    static QAbstractItemModel *createModelFromRecords(DATA *pData);
 
 private:
     void handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap, XBinary::FT fileType, const QString &sSignature, qint32 nDelta, QVariant varExtra = QVariant(),
