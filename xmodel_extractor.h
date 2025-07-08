@@ -39,7 +39,7 @@ class XModel_Extractor : public XModel {
     };
 
 public:
-    XModel_Extractor(XExtractor::DATA *pData, QObject *pParent);
+    XModel_Extractor(XExtractor::DATA *pData, QObject *pParent = nullptr);
 
     virtual QVariant data(const QModelIndex &index, int nRole = Qt::DisplayRole) const;
     virtual QVariant headerData(int nSection, Qt::Orientation orientation, int nRole = Qt::DisplayRole) const;

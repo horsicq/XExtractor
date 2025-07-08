@@ -33,7 +33,7 @@ XModel_Extractor::XModel_Extractor(XExtractor::DATA *pData, QObject *pParent) : 
     setColumnSymbolSize(COLUMN_OFFSET, XBinary::getByteSizeFromWidthMode(g_modeOffset) * 2);
     setColumnSymbolSize(COLUMN_ADDRESS, XBinary::getByteSizeFromWidthMode(g_modeAddress) * 2);
     setColumnSymbolSize(COLUMN_REGION, 1);
-    setColumnSymbolSize(COLUMN_SIZE, 4);
+    setColumnSymbolSize(COLUMN_SIZE, XBinary::getByteSizeFromWidthMode(g_modeOffset) * 2);
     setColumnSymbolSize(COLUMN_TYPE, 10);
 
     qint32 nNumberOfRegions = pData->memoryMap.listRecords.count();
@@ -82,12 +82,18 @@ QVariant XModel_Extractor::data(const QModelIndex &index, int nRole) const
                 } else {
                     result = (qint32)Qt::AlignVCenter + (qint32)Qt::AlignLeft;
                 }
+            } else if (nRole == Qt::UserRole + USERROLE_ORIGINDEX) {
+                result = nRow;
             } else if (nRole == Qt::UserRole + USERROLE_ADDRESS) {
                 result = XBinary::offsetToAddress(&(g_pData->memoryMap), g_pData->listRecords.at(nRow).nOffset);
             } else if (nRole == Qt::UserRole + USERROLE_OFFSET) {
                 result = g_pData->listRecords.at(nRow).nOffset;
             } else if (nRole == Qt::UserRole + USERROLE_SIZE) {
                 result = g_pData->listRecords.at(nRow).nSize;
+            } else if (nRole == Qt::UserRole + USERROLE_STRING1) {
+                result = g_pData->listRecords.at(nRow).sString;
+            } else if (nRole == Qt::UserRole + USERROLE_STRING2) {
+                result = g_pData->listRecords.at(nRow).sExt;
             }
         }
     }

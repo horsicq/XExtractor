@@ -40,6 +40,24 @@ void XExtractor::setData(QIODevice *pDevice, DATA *pData, XBinary::PDSTRUCT *pPd
     g_pPdStruct = pPdStruct;
 }
 
+bool XExtractor::processFile(const QString &sFileName, DATA *pData, XBinary::PDSTRUCT *pPdStruct)
+{
+    bool bResult = false;
+
+    QFile file(sFileName);
+
+    if (file.open(QIODevice::ReadOnly)) {
+        setData(&file, pData, pPdStruct);
+        process();
+
+        bResult = true;
+
+        file.close();
+    }
+
+    return bResult;
+}
+
 QList<XBinary::FT> XExtractor::getAvailableFileTypes()
 {
     QList<XBinary::FT> listResult;

@@ -41,6 +41,7 @@ public:
         bool bExtract;
         bool bMenu_Hex;
         QString sOutputDirectory;
+        bool bShowList;
     };
 
     struct RECORD {
@@ -60,6 +61,7 @@ public:
     XExtractor(QObject *pParent = nullptr);
 
     void setData(QIODevice *pDevice, DATA *pData, XBinary::PDSTRUCT *pPdStruct);
+    bool processFile(const QString &sFileName, DATA *pData, XBinary::PDSTRUCT *pPdStruct);
 
     static QList<XBinary::FT> getAvailableFileTypes();
     static XExtractor::OPTIONS getDefaultOptions();
