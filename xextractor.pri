@@ -7,9 +7,11 @@ XCONFIG += use_archive
 
 HEADERS += \
     $$PWD/xextractor.h
+    $$PWD/xmodel_extractor.h
 
 SOURCES += \
     $$PWD/xextractor.cpp
+    $$PWD/xmodel_extractor.cpp
 
 !contains(XCONFIG, xformats) {
     XCONFIG += xformats
