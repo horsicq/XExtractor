@@ -29,13 +29,20 @@ class XExtractor : public XThreadObject {
     Q_OBJECT
 
 public:
+    enum EMODE {
+        EMODE_UNKNOWN = 0,
+        EMODE_RAW,
+        EMODE_FORMAT,
+        EMODE_HEURISTIC
+    };
+
     struct OPTIONS {
         XBinary::FT fileType;
-        XBinary::MAPMODE mapMode;
+        // XBinary::MAPMODE mapMode;
         QList<XBinary::FT> listFileTypes;
         qint32 nLimit;
         bool bDeepScan;
-        XBinary::EMODE emode;  // RAW, FORMAT, HEURISTIC
+        EMODE emode;  // RAW, FORMAT, HEURISTIC
         // bool bHeuristicScan;
         bool bAnalyze;
         bool bExtract;
@@ -69,9 +76,16 @@ public:
 
     static QAbstractItemModel *createModelFromRecords(DATA *pData);
 
+    static QString extractorModeToString(EMODE mode);
+    static EMODE ftStringToExtractorMode(QString sString);
+
+    static bool isFormatModeAvailable(XBinary::FT fileType);
+
 private:
     void handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap, XBinary::FT fileType, const QString &sSignature, qint32 nDelta, QVariant varExtra = QVariant(),
                       const QString &sInfo1 = "", const QString &sInfo2 = "");
+    void handleRaw();
+    void handleFormat();
 public slots:
     void process();
 

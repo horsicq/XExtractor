@@ -20,6 +20,13 @@
  */
 #include "xextractor.h"
 
+XBinary::XCONVERT _TABLE_XExtractor_EMODE[] = {
+    {XExtractor::EMODE_UNKNOWN, "Unknown", QObject::tr("Unknown")},
+    {XExtractor::EMODE_RAW, "Raw", QObject::tr("Raw")},
+    {XExtractor::EMODE_FORMAT, "Format", QObject::tr("Format")},
+    {XExtractor::EMODE_HEURISTIC, "Heuristic", QObject::tr("Heuristic")},
+    };
+
 bool compareXExtractor(const XExtractor::RECORD &a, const XExtractor::RECORD &b)
 {
     return a.nOffset < b.nOffset;
@@ -93,6 +100,7 @@ QList<XBinary::FT> XExtractor::getAvailableFileTypes()
     listResult.append(XBinary::FT_DJVU);
     // listResult.append(XBinary::FT_CFBF);
     // listResult.append(XBinary::FT_SIGNATURE); // TODO
+    listResult.append(XBinary::FT_OTHER);
 
     return listResult;
 }
@@ -127,6 +135,7 @@ XExtractor::OPTIONS XExtractor::getDefaultOptions()
     // result.listFileTypes.append(XBinary::FT_AMIGAHUNK);
     // result.listFileTypes.append(XBinary::FT_JAVACLASS);
     // result.listFileTypes.append(XBinary::FT_SIGNATURE);
+    result.listFileTypes.append(XBinary::FT_OTHER);
 
     result.bDeepScan = true;
     result.bAnalyze = true;
@@ -138,6 +147,27 @@ XExtractor::OPTIONS XExtractor::getDefaultOptions()
 QAbstractItemModel *XExtractor::createModelFromRecords(DATA *pData)
 {
     return 0;
+}
+
+QString XExtractor::extractorModeToString(EMODE mode)
+{
+    return XBinary::XCONVERT_idToTransString(mode, _TABLE_XExtractor_EMODE, sizeof(_TABLE_XExtractor_EMODE) / sizeof(XBinary::XCONVERT));
+}
+
+bool XExtractor::isFormatModeAvailable(XBinary::FT fileType)
+{
+    bool bResult = false;
+
+    if (fileType == XBinary::FT_PDF) {
+        bResult = true;
+    }
+
+    return bResult;
+}
+
+XExtractor::EMODE XExtractor::ftStringToExtractorMode(QString sString)
+{
+    return (XExtractor::EMODE)XBinary::XCONVERT_ftStringToId(sString, _TABLE_XExtractor_EMODE, sizeof(_TABLE_XExtractor_EMODE) / sizeof(XBinary::XCONVERT));
 }
 
 QVector<XExtractor::RECORD> XExtractor::scanDevice(QIODevice *pDevice, OPTIONS options, XBinary::PDSTRUCT *pPdStruct)
@@ -319,109 +349,133 @@ void XExtractor::handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap
     }
 }
 
+void XExtractor::handleRaw()
+{
+    g_pData->listRecords.clear();
+
+    qint32 nSearchCount = g_pData->options.listFileTypes.count();
+
+    if (g_pData->options.listFileTypes.contains(XBinary::FT_ICO)) {
+        nSearchCount++;
+    }
+
+    if (g_pData->options.listFileTypes.contains(XBinary::FT_MACHO)) {
+        nSearchCount += 3;
+    }
+
+    if (g_pData->options.listFileTypes.contains(XBinary::FT_MACHOFAT)) {
+        nSearchCount++;
+    }
+
+    if (g_pData->options.listFileTypes.contains(XBinary::FT_TIFF)) {
+        nSearchCount++;
+    }
+
+    // if (g_pData->options.listFileTypes.contains(XBinary::FT_RIFF)) {
+    //     nSearchCount += 2;
+    // }
+
+    if (g_pData->options.listFileTypes.contains(XBinary::FT_AMIGAHUNK)) {
+        nSearchCount++;
+    }
+
+    if (g_pData->options.listFileTypes.contains(XBinary::FT_DJVU)) {
+        nSearchCount++;
+    }
+
+    if (g_pData->options.listFileTypes.contains(XBinary::FT_LHA)) {
+        nSearchCount += 2;
+    }
+
+    if (g_pData->options.listFileTypes.contains(XBinary::FT_BZIP2)) {
+        nSearchCount++;
+    }
+
+    g_nFreeIndex = XBinary::getFreeIndex(g_pPdStruct);
+    XBinary::setPdStructInit(g_pPdStruct, g_nFreeIndex, nSearchCount);
+
+    // TODO signatures
+    XBinary binary(g_pDevice);
+
+    connect(&binary, SIGNAL(errorMessage(QString)), this, SIGNAL(errorMessage(QString)));
+
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_PE, "'MZ'", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_ELF, "7F'ELF'", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_7Z, "'7z'BCAF271C", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_ZIP, "'PK'0304", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_RAR, "'Rar!'1A07", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_GZIP, "1F8B08", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_ZLIB, "785E", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_ZLIB, "789C", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_ZLIB, "78DA", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_DEX, "'dex\n'", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_PDF, "'%PDF'", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_PNG, "89'PNG\r\n'1A0A", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_JPEG, "FFD8FF", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_CAB, "'MSCF'", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_ICO, "00000100", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_CUR, "00000200", 0);  // CUR
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_MACHO, "FEEDFACE", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_MACHO, "CEFAEDFE", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_MACHO, "FEEDFACF", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_MACHO, "CFFAEDFE", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_MACHOFAT, "CAFEBABE", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_MACHOFAT, "BEBAFECA", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_BMP, "'BM'", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_GIF, "'GIF8'", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_TIFF, "'MM'002A", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_TIFF, "'II'2A00", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_MP3, "'ID3'", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_MP4, "'ftyp'", -4);  // 000000..'ftyp'
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_RIFF, "'RIFF'", 0);
+    // handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_RIFF, "'RIFX'", 0);
+    // handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_RIFF, "'AIFF'", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_NE, "'MZ'", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_LE, "'MZ'", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_AMIGAHUNK, "000003F3", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_AMIGAHUNK, "000003E7", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_JAVACLASS, "CAFEBABE", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_DJVU, "'AT&TFORM'", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_DJVU, "'SDJVFORM'", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_SZDD, "'SZDD'88F027'3A'", 0);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_LHA, "'-lh'..2d'", -2);  // "....'-lh'..2d"
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_LHA, "'-lz'..2d'", -2);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_LHA, "'-pm'..2d'", -2);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_BZIP2, "314159265359", -4);
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_BZIP2, "17724538509000000000", -4);  // Empty
+
+    // TODO LE/BE
+    handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_SIGNATURE, "00000000", -4, 0, "CRC32", "Test");
+    // TODO more
+
+    std::sort(g_pData->listRecords.begin(), g_pData->listRecords.end(), compareXExtractor);
+
+    XBinary::setPdStructFinished(g_pPdStruct, g_nFreeIndex);
+}
+
+void XExtractor::handleFormat()
+{
+    // TODO
+}
+
 void XExtractor::process()
 {
     if (g_pData->options.bAnalyze) {
-        g_pData->listRecords.clear();
-
-        qint32 nSearchCount = g_pData->options.listFileTypes.count();
-
-        if (g_pData->options.listFileTypes.contains(XBinary::FT_ICO)) {
-            nSearchCount++;
+        if (g_pData->options.emode == EMODE_HEURISTIC) {
+            if (isFormatModeAvailable(g_pData->options.fileType)) {
+                handleFormat();
+            } else {
+                handleRaw();
+            }
+        } else if (g_pData->options.emode == EMODE_FORMAT) {
+            if (isFormatModeAvailable(g_pData->options.fileType)) {
+                handleFormat();
+            } else {
+                emit errorMessage(QObject::tr("Mode is not available for this file type"));
+            }
+        } else if (g_pData->options.emode == EMODE_RAW) {
+            handleRaw();
         }
-
-        if (g_pData->options.listFileTypes.contains(XBinary::FT_MACHO)) {
-            nSearchCount += 3;
-        }
-
-        if (g_pData->options.listFileTypes.contains(XBinary::FT_MACHOFAT)) {
-            nSearchCount++;
-        }
-
-        if (g_pData->options.listFileTypes.contains(XBinary::FT_TIFF)) {
-            nSearchCount++;
-        }
-
-        // if (g_pData->options.listFileTypes.contains(XBinary::FT_RIFF)) {
-        //     nSearchCount += 2;
-        // }
-
-        if (g_pData->options.listFileTypes.contains(XBinary::FT_AMIGAHUNK)) {
-            nSearchCount++;
-        }
-
-        if (g_pData->options.listFileTypes.contains(XBinary::FT_DJVU)) {
-            nSearchCount++;
-        }
-
-        if (g_pData->options.listFileTypes.contains(XBinary::FT_LHA)) {
-            nSearchCount += 2;
-        }
-
-        if (g_pData->options.listFileTypes.contains(XBinary::FT_BZIP2)) {
-            nSearchCount++;
-        }
-
-        g_nFreeIndex = XBinary::getFreeIndex(g_pPdStruct);
-        XBinary::setPdStructInit(g_pPdStruct, g_nFreeIndex, nSearchCount);
-
-        // TODO signatures
-        XBinary binary(g_pDevice);
-
-        connect(&binary, SIGNAL(errorMessage(QString)), this, SIGNAL(errorMessage(QString)));
-
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_PE, "'MZ'", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_ELF, "7F'ELF'", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_7Z, "'7z'BCAF271C", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_ZIP, "'PK'0304", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_RAR, "'Rar!'1A07", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_GZIP, "1F8B08", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_ZLIB, "785E", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_ZLIB, "789C", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_ZLIB, "78DA", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_DEX, "'dex\n'", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_PDF, "'%PDF'", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_PNG, "89'PNG\r\n'1A0A", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_JPEG, "FFD8FF", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_CAB, "'MSCF'", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_ICO, "00000100", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_CUR, "00000200", 0);  // CUR
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_MACHO, "FEEDFACE", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_MACHO, "CEFAEDFE", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_MACHO, "FEEDFACF", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_MACHO, "CFFAEDFE", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_MACHOFAT, "CAFEBABE", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_MACHOFAT, "BEBAFECA", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_BMP, "'BM'", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_GIF, "'GIF8'", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_TIFF, "'MM'002A", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_TIFF, "'II'2A00", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_MP3, "'ID3'", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_MP4, "'ftyp'", -4);  // 000000..'ftyp'
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_RIFF, "'RIFF'", 0);
-        // handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_RIFF, "'RIFX'", 0);
-        // handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_RIFF, "'AIFF'", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_NE, "'MZ'", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_LE, "'MZ'", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_AMIGAHUNK, "000003F3", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_AMIGAHUNK, "000003E7", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_JAVACLASS, "CAFEBABE", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_DJVU, "'AT&TFORM'", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_DJVU, "'SDJVFORM'", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_SZDD, "'SZDD'88F027'3A'", 0);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_LHA, "'-lh'..2d'", -2);  // "....'-lh'..2d"
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_LHA, "'-lz'..2d'", -2);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_LHA, "'-pm'..2d'", -2);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_BZIP2, "314159265359", -4);
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_BZIP2, "17724538509000000000", -4);  // Empty
-
-        // TODO LE/BE
-        handleSearch(&binary, &(g_pData->memoryMap), XBinary::FT_SIGNATURE, "00000000", -4, 0, "CRC32", "Test");
-        // TODO more
-
-        std::sort(g_pData->listRecords.begin(), g_pData->listRecords.end(), compareXExtractor);
-
-        XBinary::setPdStructFinished(g_pPdStruct, g_nFreeIndex);
     }
 
     if (g_pData->options.bExtract) {
