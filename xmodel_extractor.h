@@ -51,4 +51,4 @@ private:
     XBinary::MODE g_modeOffset;
 };
 
-#endif // XMODEL_EXTRACTOR_H
+#endif  // XMODEL_EXTRACTOR_H

@@ -20,7 +20,8 @@
  */
 #include "xmodel_extractor.h"
 
-XModel_Extractor::XModel_Extractor(XExtractor::DATA *pData, QObject *pParent) : XModel(pParent) {
+XModel_Extractor::XModel_Extractor(XExtractor::DATA *pData, QObject *pParent) : XModel(pParent)
+{
     g_pData = pData;
 
     _setRowCount(pData->listRecords.count());
