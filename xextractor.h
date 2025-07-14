@@ -33,7 +33,8 @@ public:
         EMODE_UNKNOWN = 0,
         EMODE_RAW,
         EMODE_FORMAT,
-        EMODE_HEURISTIC
+        EMODE_HEURISTIC,
+        EMODE_UNPACK,
     };
 
     struct OPTIONS {
@@ -80,12 +81,14 @@ public:
     static EMODE ftStringToExtractorMode(QString sString);
 
     static bool isFormatModeAvailable(XBinary::FT fileType);
+    static bool isUnpackModeAvailable(XBinary::FT fileType);
 
 private:
     void handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap, XBinary::FT fileType, const QString &sSignature, qint32 nDelta, QVariant varExtra = QVariant(),
                       const QString &sInfo1 = "", const QString &sInfo2 = "");
     void handleRaw();
     void handleFormat();
+    void handleUnpack();
 public slots:
     void process();
 

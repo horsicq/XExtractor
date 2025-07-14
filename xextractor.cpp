@@ -25,6 +25,7 @@ XBinary::XCONVERT _TABLE_XExtractor_EMODE[] = {
     {XExtractor::EMODE_RAW, "Raw", QObject::tr("Raw")},
     {XExtractor::EMODE_FORMAT, "Format", QObject::tr("Format")},
     {XExtractor::EMODE_HEURISTIC, "Heuristic", QObject::tr("Heuristic")},
+    {XExtractor::EMODE_UNPACK, "Unpack", QObject::tr("Unpack")},
 };
 
 bool compareXExtractor(const XExtractor::RECORD &a, const XExtractor::RECORD &b)
@@ -159,6 +160,17 @@ bool XExtractor::isFormatModeAvailable(XBinary::FT fileType)
     bool bResult = false;
 
     if (fileType == XBinary::FT_PDF) {
+        bResult = true;
+    }
+
+    return bResult;
+}
+
+bool XExtractor::isUnpackModeAvailable(XBinary::FT fileType)
+{
+    bool bResult = false;
+
+    if (fileType == XBinary::FT_ZIP) {
         bResult = true;
     }
 
@@ -458,6 +470,11 @@ void XExtractor::handleFormat()
     // TODO
 }
 
+void XExtractor::handleUnpack()
+{
+    // TODO
+}
+
 void XExtractor::process()
 {
     if (g_pData->options.bAnalyze) {
@@ -475,6 +492,12 @@ void XExtractor::process()
             }
         } else if (g_pData->options.emode == EMODE_RAW) {
             handleRaw();
+        } else if (g_pData->options.emode == EMODE_UNPACK) {
+            if (isUnpackModeAvailable(g_pData->options.fileType)) {
+                handleUnpack();
+            } else {
+                emit errorMessage(QObject::tr("Mode is not available for this file type"));
+            }
         }
     }
 
