@@ -477,6 +477,8 @@ void XExtractor::handleUnpack()
 
 void XExtractor::process()
 {
+    bool bInvalidMode = false;
+
     if (g_pData->options.bAnalyze) {
         if (g_pData->options.emode == EMODE_HEURISTIC) {
             if (isFormatModeAvailable(g_pData->options.fileType)) {
@@ -488,7 +490,7 @@ void XExtractor::process()
             if (isFormatModeAvailable(g_pData->options.fileType)) {
                 handleFormat();
             } else {
-                emit errorMessage(QObject::tr("Mode is not available for this file type"));
+                 bInvalidMode = true;
             }
         } else if (g_pData->options.emode == EMODE_RAW) {
             handleRaw();
@@ -496,9 +498,13 @@ void XExtractor::process()
             if (isUnpackModeAvailable(g_pData->options.fileType)) {
                 handleUnpack();
             } else {
-                emit errorMessage(QObject::tr("Mode is not available for this file type"));
+                bInvalidMode = true;
             }
         }
+    }
+
+    if (bInvalidMode) {
+        emit errorMessage(tr("Mode is not available for this file type"));
     }
 
     if (g_pData->options.bExtract) {

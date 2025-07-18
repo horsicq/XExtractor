@@ -30,6 +30,14 @@ XModel_Extractor::XModel_Extractor(XExtractor::DATA *pData, QObject *pParent) : 
     g_modeAddress = XBinary::getWidthModeFromSize_32_64(pData->memoryMap.nModuleAddress + pData->memoryMap.nImageSize);
     g_modeOffset = XBinary::getWidthModeFromSize_32_64(pData->memoryMap.nBinarySize);
 
+    setColumnAlignment(COLUMN_NUMBER, Qt::AlignVCenter | Qt::AlignRight);
+    setColumnAlignment(COLUMN_OFFSET, Qt::AlignVCenter | Qt::AlignRight);
+    setColumnAlignment(COLUMN_ADDRESS, Qt::AlignVCenter | Qt::AlignRight);
+    setColumnAlignment(COLUMN_REGION, Qt::AlignVCenter | Qt::AlignLeft);
+    setColumnAlignment(COLUMN_SIZE, Qt::AlignVCenter | Qt::AlignRight);
+    setColumnAlignment(COLUMN_TYPE, Qt::AlignVCenter | Qt::AlignLeft);
+    setColumnAlignment(COLUMN_INFO, Qt::AlignVCenter | Qt::AlignLeft);
+
     setColumnSymbolSize(COLUMN_NUMBER, QString::number(rowCount()).length());
     setColumnSymbolSize(COLUMN_OFFSET, XBinary::getByteSizeFromWidthMode(g_modeOffset) * 2);
     setColumnSymbolSize(COLUMN_ADDRESS, XBinary::getByteSizeFromWidthMode(g_modeAddress) * 2);
@@ -78,11 +86,7 @@ QVariant XModel_Extractor::data(const QModelIndex &index, int nRole) const
                     result = g_pData->listRecords.at(nRow).sString;
                 }
             } else if (nRole == Qt::TextAlignmentRole) {
-                if ((nColumn == COLUMN_NUMBER) || (nColumn == COLUMN_OFFSET) || (nColumn == COLUMN_ADDRESS) || (nColumn == COLUMN_SIZE)) {
-                    result = (qint32)Qt::AlignVCenter + (qint32)Qt::AlignRight;
-                } else {
-                    result = (qint32)Qt::AlignVCenter + (qint32)Qt::AlignLeft;
-                }
+                result = getColumnAlignment(nColumn);
             } else if (nRole == Qt::UserRole + USERROLE_ORIGINDEX) {
                 result = nRow;
             } else if (nRole == Qt::UserRole + USERROLE_ADDRESS) {
@@ -124,11 +128,7 @@ QVariant XModel_Extractor::headerData(int nSection, Qt::Orientation orientation,
                 result = tr("Info");
             }
         } else if (nRole == Qt::TextAlignmentRole) {
-            if ((nSection == COLUMN_NUMBER) || (nSection == COLUMN_OFFSET) || (nSection == COLUMN_ADDRESS) || (nSection == COLUMN_SIZE)) {
-                result = (qint32)Qt::AlignVCenter + (qint32)Qt::AlignRight;
-            } else {
-                result = (qint32)Qt::AlignVCenter + (qint32)Qt::AlignLeft;
-            }
+            result = getColumnAlignment(nSection);
         }
     }
 
