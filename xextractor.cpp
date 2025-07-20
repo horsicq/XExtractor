@@ -21,10 +21,8 @@
 #include "xextractor.h"
 
 XBinary::XCONVERT _TABLE_XExtractor_EMODE[] = {
-    {XExtractor::EMODE_UNKNOWN, "Unknown", QObject::tr("Unknown")},
-    {XExtractor::EMODE_RAW, "Raw", QObject::tr("Raw")},
-    {XExtractor::EMODE_FORMAT, "Format", QObject::tr("Format")},
-    {XExtractor::EMODE_HEURISTIC, "Heuristic", QObject::tr("Heuristic")},
+    {XExtractor::EMODE_UNKNOWN, "Unknown", QObject::tr("Unknown")}, {XExtractor::EMODE_RAW, "Raw", QObject::tr("Raw")},
+    {XExtractor::EMODE_FORMAT, "Format", QObject::tr("Format")},    {XExtractor::EMODE_HEURISTIC, "Heuristic", QObject::tr("Heuristic")},
     {XExtractor::EMODE_UNPACK, "Unpack", QObject::tr("Unpack")},
 };
 
@@ -490,7 +488,7 @@ void XExtractor::process()
             if (isFormatModeAvailable(g_pData->options.fileType)) {
                 handleFormat();
             } else {
-                 bInvalidMode = true;
+                bInvalidMode = true;
             }
         } else if (g_pData->options.emode == EMODE_RAW) {
             handleRaw();
