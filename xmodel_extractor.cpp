@@ -35,6 +35,7 @@ XModel_Extractor::XModel_Extractor(XExtractor::DATA *pData, QObject *pParent) : 
     setColumnAlignment(COLUMN_ADDRESS, Qt::AlignVCenter | Qt::AlignRight);
     setColumnAlignment(COLUMN_REGION, Qt::AlignVCenter | Qt::AlignLeft);
     setColumnAlignment(COLUMN_SIZE, Qt::AlignVCenter | Qt::AlignRight);
+    setColumnAlignment(COLUMN_METHOD, Qt::AlignVCenter | Qt::AlignLeft);
     setColumnAlignment(COLUMN_TYPE, Qt::AlignVCenter | Qt::AlignLeft);
     setColumnAlignment(COLUMN_INFO, Qt::AlignVCenter | Qt::AlignLeft);
 
@@ -43,6 +44,7 @@ XModel_Extractor::XModel_Extractor(XExtractor::DATA *pData, QObject *pParent) : 
     setColumnSymbolSize(COLUMN_ADDRESS, XBinary::getByteSizeFromWidthMode(g_modeAddress) * 2);
     setColumnSymbolSize(COLUMN_REGION, 1);
     setColumnSymbolSize(COLUMN_SIZE, XBinary::getByteSizeFromWidthMode(g_modeOffset) * 2);
+    setColumnSymbolSize(COLUMN_METHOD, 10);
     setColumnSymbolSize(COLUMN_TYPE, 10);
 
     qint32 nNumberOfRegions = pData->memoryMap.listRecords.count();
@@ -80,6 +82,8 @@ QVariant XModel_Extractor::data(const QModelIndex &index, int nRole) const
                     result = XBinary::getMemoryRecordByOffset(&(g_pData->memoryMap), g_pData->listRecords.at(nRow).nOffset).sName;
                 } else if (nColumn == COLUMN_SIZE) {
                     result = QString::number(g_pData->listRecords.at(nRow).nSize, 16);
+                } else if (nColumn == COLUMN_METHOD) {
+                    result = XBinary::compressMethodToString(g_pData->listRecords.at(nRow).compressMethod);;
                 } else if (nColumn == COLUMN_TYPE) {
                     result = XBinary::fileTypeIdToString(g_pData->listRecords.at(nRow).fileType);
                 } else if (nColumn == COLUMN_INFO) {
@@ -122,6 +126,8 @@ QVariant XModel_Extractor::headerData(int nSection, Qt::Orientation orientation,
                 result = tr("Region");
             } else if (nSection == COLUMN_SIZE) {
                 result = tr("Size");
+            } else if (nSection == COLUMN_METHOD) {
+                result = tr("Method");
             } else if (nSection == COLUMN_TYPE) {
                 result = tr("Type");
             } else if (nSection == COLUMN_INFO) {

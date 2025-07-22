@@ -33,6 +33,7 @@ class XModel_Extractor : public XModel {
         COLUMN_ADDRESS,
         COLUMN_REGION,
         COLUMN_SIZE,
+        COLUMN_METHOD,
         COLUMN_TYPE,
         COLUMN_INFO,
         __COLUMN_SIZE

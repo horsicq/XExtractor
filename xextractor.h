@@ -50,12 +50,14 @@ public:
         bool bMenu_Hex;
         QString sOutputDirectory;
         bool bShowList;
+        qint64 nBufferSize;
     };
 
     struct RECORD {
         qint64 nOffset;
         qint64 nSize;
         XBinary::FT fileType;
+        XBinary::COMPRESS_METHOD compressMethod;
         QString sString;
         QString sExt;
     };
@@ -84,11 +86,11 @@ public:
     static bool isUnpackModeAvailable(XBinary::FT fileType);
 
 private:
-    void handleSearch(XBinary *pBinary, XBinary::_MEMORY_MAP *pMemoryMap, XBinary::FT fileType, const QString &sSignature, qint32 nDelta, QVariant varExtra = QVariant(),
-                      const QString &sInfo1 = "", const QString &sInfo2 = "");
+    void handleSearch(qint32 nGlobalIndex, XBinary *pBinary, DATA *pData, XBinary::FT fileType, const QString &sSignature, qint32 nDelta, XBinary::PDSTRUCT *pPdStruct);
     void handleRaw();
     void handleFormat();
     void handleUnpack();
+
 public slots:
     void process();
 
@@ -96,7 +98,6 @@ private:
     QIODevice *g_pDevice;
     DATA *g_pData;
     XBinary::PDSTRUCT *g_pPdStruct;
-    qint32 g_nFreeIndex;
 };
 
 #endif  // XEXTRACTOR_H
