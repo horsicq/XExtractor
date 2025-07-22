@@ -43,7 +43,7 @@ public:
         QList<XBinary::FT> listFileTypes;
         qint32 nLimit;
         bool bDeepScan;
-        EMODE emode;  // RAW, FORMAT, HEURISTIC
+        EMODE emode;  // RAW, FORMAT, HEURISTIC, UNPACK
         // bool bHeuristicScan;
         bool bAnalyze;
         bool bExtract;
