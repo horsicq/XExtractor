@@ -83,7 +83,8 @@ QVariant XModel_Extractor::data(const QModelIndex &index, int nRole) const
                 } else if (nColumn == COLUMN_SIZE) {
                     result = QString::number(g_pData->listRecords.at(nRow).nSize, 16);
                 } else if (nColumn == COLUMN_METHOD) {
-                    result = XBinary::compressMethodToString(g_pData->listRecords.at(nRow).compressMethod);;
+                    result = XBinary::compressMethodToString(g_pData->listRecords.at(nRow).compressMethod);
+                    ;
                 } else if (nColumn == COLUMN_TYPE) {
                     result = XBinary::fileTypeIdToString(g_pData->listRecords.at(nRow).fileType);
                 } else if (nColumn == COLUMN_INFO) {

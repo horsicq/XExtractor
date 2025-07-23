@@ -193,7 +193,8 @@ QVector<XExtractor::RECORD> XExtractor::scanDevice(QIODevice *pDevice, OPTIONS o
     return _data.listRecords;
 }
 
-void XExtractor::handleSearch(qint32 nGlobalIndex, XBinary *pBinary, DATA *pData, XBinary::FT fileType, const QString &sSignature, qint32 nDelta, XBinary::PDSTRUCT *pPdStruct)
+void XExtractor::handleSearch(qint32 nGlobalIndex, XBinary *pBinary, DATA *pData, XBinary::FT fileType, const QString &sSignature, qint32 nDelta,
+                              XBinary::PDSTRUCT *pPdStruct)
 {
     if (g_pData->options.listFileTypes.contains(fileType)) {
         XBinary::setPdStructStatus(pPdStruct, nGlobalIndex, XBinary::fileTypeIdToString(fileType));
@@ -476,7 +477,7 @@ void XExtractor::handleFormat()
         qint32 nGlobalIndex = XBinary::getFreeIndex(g_pPdStruct);
         XBinary::setPdStructInit(g_pPdStruct, nGlobalIndex, nNumberOfParts);
 
-        for (qint32 i = 0; (i < nNumberOfParts) && XBinary::isPdStructNotCanceled(g_pPdStruct) ; i++) {
+        for (qint32 i = 0; (i < nNumberOfParts) && XBinary::isPdStructNotCanceled(g_pPdStruct); i++) {
             XBinary::setPdStructStatus(g_pPdStruct, nGlobalIndex, listParts.at(i).sOriginalName);
 
             // TODO
