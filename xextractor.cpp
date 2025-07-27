@@ -133,7 +133,7 @@ XExtractor::OPTIONS XExtractor::getDefaultOptions()
     // result.listFileTypes.append(XBinary::FT_AMIGAHUNK);
     // result.listFileTypes.append(XBinary::FT_JAVACLASS);
     // result.listFileTypes.append(XBinary::FT_SIGNATURE);
-    result.listFileTypes.append(XBinary::FT_OTHER);
+    // result.listFileTypes.append(XBinary::FT_OTHER);
 
     result.bDeepScan = true;
     result.bAnalyze = true;
