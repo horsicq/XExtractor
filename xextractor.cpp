@@ -492,6 +492,9 @@ void XExtractor::handleFormat()
 
 void XExtractor::handleUnpack()
 {
+    if (g_pData->options.fileType == XBinary::FT_ZIP) {
+        XFormats::getFileParts(g_pData->options.fileType, g_pDevice, XBinary::FILEPART_STREAM, -1, false, -1, g_pPdStruct);
+    }
     // TODO
 }
 
