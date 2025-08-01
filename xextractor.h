@@ -88,8 +88,7 @@ public:
 private:
     void handleSearch(qint32 nGlobalIndex, XBinary *pBinary, DATA *pData, XBinary::FT fileType, const QString &sSignature, qint32 nDelta, XBinary::PDSTRUCT *pPdStruct);
     void handleRaw();
-    void handleFormat();
-    void handleUnpack();
+    void handleFormatUnpack(XBinary::FT fileType, bool bUnpack);
 
 public slots:
     void process();

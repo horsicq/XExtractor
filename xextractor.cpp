@@ -158,7 +158,7 @@ bool XExtractor::isFormatModeAvailable(XBinary::FT fileType)
 {
     bool bResult = false;
 
-    if (fileType == XBinary::FT_PDF) {
+    if ((fileType == XBinary::FT_ZIP) || (fileType == XBinary::FT_JAR) || (fileType == XBinary::FT_APK) || (fileType == XBinary::FT_APKS) || (fileType == XBinary::FT_PDF)) {
         bResult = true;
     }
 
@@ -169,7 +169,7 @@ bool XExtractor::isUnpackModeAvailable(XBinary::FT fileType)
 {
     bool bResult = false;
 
-    if (fileType == XBinary::FT_ZIP) {
+    if ((fileType == XBinary::FT_ZIP) || (fileType == XBinary::FT_JAR) || (fileType == XBinary::FT_APK) || (fileType == XBinary::FT_APKS) || (fileType == XBinary::FT_PDF)) {
         bResult = true;
     }
 
@@ -461,14 +461,14 @@ void XExtractor::handleRaw()
     XBinary::setPdStructFinished(g_pPdStruct, nGlobalIndex);
 }
 
-void XExtractor::handleFormat()
+void XExtractor::handleFormatUnpack(XBinary::FT fileType, bool bUnpack)
 {
     g_pData->listRecords.clear();
 
     QList<XBinary::FPART> listParts;
 
-    if (g_pData->options.fileType == XBinary::FT_ZIP) {
-        listParts = XFormats::getFileParts(g_pData->options.fileType, g_pDevice, XBinary::FILEPART_STREAM, -1, false, -1, g_pPdStruct);
+    if (fileType == XBinary::FT_ZIP) {
+        listParts = XFormats::getFileParts(fileType, g_pDevice, XBinary::FILEPART_STREAM, -1, false, -1, g_pPdStruct);
     }
 
     qint32 nNumberOfParts = listParts.count();
@@ -478,9 +478,26 @@ void XExtractor::handleFormat()
         XBinary::setPdStructInit(g_pPdStruct, nGlobalIndex, nNumberOfParts);
 
         for (qint32 i = 0; (i < nNumberOfParts) && XBinary::isPdStructNotCanceled(g_pPdStruct); i++) {
-            XBinary::setPdStructStatus(g_pPdStruct, nGlobalIndex, listParts.at(i).sOriginalName);
+            XBinary::FPART fpart = listParts.at(i);
 
-            // TODO
+            XBinary::setPdStructStatus(g_pPdStruct, nGlobalIndex, fpart.sOriginalName);
+
+            RECORD record = {};
+
+            record.compressMethod = (XBinary::COMPRESS_METHOD)fpart.mapProperties.value(XBinary::FPART_PROP_COMPRESSMETHOD, XBinary::COMPRESS_METHOD_UNKNOWN).toUInt();
+            record.nOffset = fpart.nFileOffset;
+            record.nSize = fpart.nFileSize;
+
+            record.sString = fpart.sOriginalName;
+            // record.sExt = formatInfo.sExt;
+            // record.fileType = formatInfo.fileType;
+
+            // Fix if more than the device size
+            if ((record.nOffset + record.nSize) > g_pDevice->size()) {
+                record.nSize = (g_pDevice->size() - record.nOffset);
+            }
+
+            g_pData->listRecords.append(record);
 
             XBinary::setPdStructCurrentIncrement(g_pPdStruct, nGlobalIndex);
         }
@@ -490,36 +507,34 @@ void XExtractor::handleFormat()
     }
 }
 
-void XExtractor::handleUnpack()
-{
-    if (g_pData->options.fileType == XBinary::FT_ZIP) {
-        XFormats::getFileParts(g_pData->options.fileType, g_pDevice, XBinary::FILEPART_STREAM, -1, false, -1, g_pPdStruct);
-    }
-    // TODO
-}
-
 void XExtractor::process()
 {
     bool bInvalidMode = false;
 
+    XBinary::FT fileType = g_pData->options.fileType;
+
+    if (fileType == XBinary::FT_UNKNOWN) {
+        fileType = XBinary::getPrefFileType(g_pDevice, true);
+    }
+
     if (g_pData->options.bAnalyze) {
         if (g_pData->options.emode == EMODE_HEURISTIC) {
-            if (isFormatModeAvailable(g_pData->options.fileType)) {
-                handleFormat();
+            if (isFormatModeAvailable(fileType)) {
+                handleFormatUnpack(fileType, false);
             } else {
                 handleRaw();
             }
         } else if (g_pData->options.emode == EMODE_FORMAT) {
-            if (isFormatModeAvailable(g_pData->options.fileType)) {
-                handleFormat();
+            if (isFormatModeAvailable(fileType)) {
+                handleFormatUnpack(fileType, false);
             } else {
                 bInvalidMode = true;
             }
         } else if (g_pData->options.emode == EMODE_RAW) {
             handleRaw();
         } else if (g_pData->options.emode == EMODE_UNPACK) {
-            if (isUnpackModeAvailable(g_pData->options.fileType)) {
-                handleUnpack();
+            if (isUnpackModeAvailable(fileType)) {
+                handleFormatUnpack(fileType, true);
             } else {
                 bInvalidMode = true;
             }
@@ -527,6 +542,9 @@ void XExtractor::process()
     }
 
     if (bInvalidMode) {
+#ifdef QT_DEBUG
+        qDebug() << "Invalid mode" << XBinary::fileTypeIdToString(fileType) << g_pData->options.emode;
+#endif
         emit errorMessage(tr("Mode is not available for this file type"));
     }
 
