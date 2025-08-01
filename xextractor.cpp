@@ -158,7 +158,8 @@ bool XExtractor::isFormatModeAvailable(XBinary::FT fileType)
 {
     bool bResult = false;
 
-    if ((fileType == XBinary::FT_ZIP) || (fileType == XBinary::FT_JAR) || (fileType == XBinary::FT_APK) || (fileType == XBinary::FT_APKS) || (fileType == XBinary::FT_PDF)) {
+    if ((fileType == XBinary::FT_ZIP) || (fileType == XBinary::FT_JAR) || (fileType == XBinary::FT_APK) || (fileType == XBinary::FT_APKS) ||
+        (fileType == XBinary::FT_PDF)) {
         bResult = true;
     }
 
@@ -169,7 +170,8 @@ bool XExtractor::isUnpackModeAvailable(XBinary::FT fileType)
 {
     bool bResult = false;
 
-    if ((fileType == XBinary::FT_ZIP) || (fileType == XBinary::FT_JAR) || (fileType == XBinary::FT_APK) || (fileType == XBinary::FT_APKS) || (fileType == XBinary::FT_PDF)) {
+    if ((fileType == XBinary::FT_ZIP) || (fileType == XBinary::FT_JAR) || (fileType == XBinary::FT_APK) || (fileType == XBinary::FT_APKS) ||
+        (fileType == XBinary::FT_PDF)) {
         bResult = true;
     }
 
