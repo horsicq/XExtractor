@@ -471,6 +471,8 @@ void XExtractor::handleFormatUnpack(XBinary::FT fileType, bool bUnpack)
 
     if (fileType == XBinary::FT_ZIP) {
         listParts = XFormats::getFileParts(fileType, g_pDevice, XBinary::FILEPART_STREAM, -1, false, -1, g_pPdStruct);
+    } else if (fileType == XBinary::FT_PDF) {
+        listParts = XFormats::getFileParts(fileType, g_pDevice, XBinary::FILEPART_STREAM, -1, false, -1, g_pPdStruct);
     }
 
     qint32 nNumberOfParts = listParts.count();
@@ -482,35 +484,83 @@ void XExtractor::handleFormatUnpack(XBinary::FT fileType, bool bUnpack)
         for (qint32 i = 0; (i < nNumberOfParts) && XBinary::isPdStructNotCanceled(g_pPdStruct); i++) {
             XBinary::FPART fpart = listParts.at(i);
 
-            XBinary::setPdStructStatus(g_pPdStruct, nGlobalIndex, fpart.sOriginalName);
+            QString sPrefName = fpart.sOriginalName;
 
-            RECORD record = {};
-
-            record.compressMethod = (XBinary::COMPRESS_METHOD)fpart.mapProperties.value(XBinary::FPART_PROP_COMPRESSMETHOD, XBinary::COMPRESS_METHOD_UNKNOWN).toUInt();
-            record.nOffset = fpart.nFileOffset;
-            record.nSize = fpart.nFileSize;
-
-            record.sString = fpart.sOriginalName;
-            // record.sExt = formatInfo.sExt;
-            // record.fileType = formatInfo.fileType;
-
-            // Fix if more than the device size
-            if ((record.nOffset + record.nSize) > g_pDevice->size()) {
-                record.nSize = (g_pDevice->size() - record.nOffset);
+            if (sPrefName == "") {
+                sPrefName = fpart.sName;
             }
 
-            g_pData->listRecords.append(record);
+            XBinary::setPdStructStatus(g_pPdStruct, nGlobalIndex, sPrefName);
+
+            bool bAdd = false;
+
+            if (fpart.nFileSize > 0) {
+                RECORD record = {};
+                record.nSize = fpart.nFileSize;
+
+                record.compressMethod = (XBinary::COMPRESS_METHOD)fpart.mapProperties.value(XBinary::FPART_PROP_COMPRESSMETHOD, XBinary::COMPRESS_METHOD_UNKNOWN).toUInt();
+                record.nOffset = fpart.nFileOffset;
+
+                record.sName = sPrefName;
+
+                if (bUnpack) {
+                    bAdd = true;
+                } else {
+                    XCompressedDevice compressedDevice;
+                    compressedDevice.setData(g_pDevice, fpart, g_pPdStruct);
+
+                    if (compressedDevice.open(QIODevice::ReadOnly)) {
+                        QSet<XBinary::FT> stFileTypes = XFormats::getFileTypes(&compressedDevice, true, g_pPdStruct);
+                        XBinary::FT fileType = XBinary::_getPrefFileType(&stFileTypes);
+                        XBinary::FILEFORMATINFO formatInfo = XFormats::getFileFormatInfo(fileType, &compressedDevice, false, -1, g_pPdStruct);
+
+                        record.sExt = formatInfo.sExt;
+                        record.fileType = formatInfo.fileType;
+                        record.sString = XBinary::getFileFormatString(&formatInfo);
+
+                        if (g_pData->options.listFileTypes.contains(XBinary::FT_OTHER)) {
+                            bAdd = true;
+                        } else {
+                            qint32 nNumberOfFileTypes = g_pData->options.listFileTypes.count();
+
+                            for (qint32 j = 0; j < nNumberOfFileTypes; j++) {
+                                XBinary::FT _fileType = g_pData->options.listFileTypes.at(j);
+
+                                if (stFileTypes.contains(_fileType)) {
+                                    bAdd = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        compressedDevice.close();
+                    }
+                }
+
+                bAdd = true;
+
+                if (bAdd) {
+                    // Fix if more than the device size
+                    if ((record.nOffset + record.nSize) > g_pDevice->size()) {
+                        record.nSize = (g_pDevice->size() - record.nOffset);
+                    }
+
+                    g_pData->listRecords.append(record);
+                }
+            }
 
             XBinary::setPdStructCurrentIncrement(g_pPdStruct, nGlobalIndex);
         }
 
-        // TODO
         XBinary::setPdStructFinished(g_pPdStruct, nGlobalIndex);
     }
 }
 
 void XExtractor::process()
 {
+    qint32 _nFreeIndex = XBinary::getFreeIndex(g_pPdStruct);
+    XBinary::setPdStructInit(g_pPdStruct, _nFreeIndex, 1);
+
     bool bInvalidMode = false;
 
     XBinary::FT fileType = g_pData->options.fileType;
@@ -551,6 +601,12 @@ void XExtractor::process()
     }
 
     if (g_pData->options.bExtract) {
-        // TODO
+        if (g_pData->options.emode == EMODE_UNPACK) {
+            XFormats xformats;
+            _connect(&xformats);
+            xformats.unpackDeviceToFolder(fileType, g_pDevice, g_pData->options.sOutputDirectory, g_pPdStruct);
+        }
     }
+
+    XBinary::setPdStructFinished(g_pPdStruct, _nFreeIndex);
 }

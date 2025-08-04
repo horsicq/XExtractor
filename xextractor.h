@@ -59,6 +59,7 @@ public:
         XBinary::FT fileType;
         XBinary::COMPRESS_METHOD compressMethod;
         QString sString;
+        QString sName;  // For unpack mode
         QString sExt;
     };
 

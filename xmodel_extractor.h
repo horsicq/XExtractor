@@ -27,16 +27,32 @@
 class XModel_Extractor : public XModel {
     Q_OBJECT
 
-    enum COLUMN {
-        COLUMN_NUMBER,
-        COLUMN_OFFSET,
-        COLUMN_ADDRESS,
-        COLUMN_REGION,
-        COLUMN_SIZE,
-        COLUMN_METHOD,
-        COLUMN_TYPE,
-        COLUMN_INFO,
-        __COLUMN_SIZE
+    enum COLUMN_GENERIC {
+        COLUMN_GENERIC_NUMBER,
+        COLUMN_GENERIC_OFFSET,
+        COLUMN_GENERIC_ADDRESS,
+        COLUMN_GENERIC_REGION,
+        COLUMN_GENERIC_SIZE,
+        COLUMN_GENERIC_METHOD,
+        __COLUMN_GENERIC_SIZE
+    };
+
+    enum COLUMN_RAW {
+        COLUMN_RAW_TYPE = __COLUMN_GENERIC_SIZE,
+        COLUMN_RAW_INFO,
+        __COLUMN_RAW_SIZE
+    };
+
+    enum COLUMN_FORMAT {
+        COLUMN_FORMAT_TYPE = __COLUMN_GENERIC_SIZE,
+        COLUMN_FORMAT_INFO,
+        COLUMN_FORMAT_NAME,
+        __COLUMN_FORMAT_SIZE
+    };
+
+    enum COLUMN_UNPACK {
+        COLUMN_UNPACK_NAME = __COLUMN_GENERIC_SIZE,
+        __COLUMN_UNPACK_SIZE
     };
 
 public:

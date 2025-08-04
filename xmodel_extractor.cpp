@@ -25,27 +25,55 @@ XModel_Extractor::XModel_Extractor(XExtractor::DATA *pData, QObject *pParent) : 
     g_pData = pData;
 
     _setRowCount(pData->listRecords.count());
-    _setColumnCount(__COLUMN_SIZE);
+
+    if (pData->options.emode == XExtractor::EMODE_UNPACK) {
+        _setColumnCount(__COLUMN_UNPACK_SIZE);
+    } else if (pData->options.emode == XExtractor::EMODE_FORMAT) {
+        _setColumnCount(__COLUMN_FORMAT_SIZE);
+    } else if (pData->options.emode == XExtractor::EMODE_RAW) {
+        _setColumnCount(__COLUMN_RAW_SIZE);
+    } else {
+        _setColumnCount(__COLUMN_GENERIC_SIZE);
+    }
 
     g_modeAddress = XBinary::getWidthModeFromSize_32_64(pData->memoryMap.nModuleAddress + pData->memoryMap.nImageSize);
     g_modeOffset = XBinary::getWidthModeFromSize_32_64(pData->memoryMap.nBinarySize);
 
-    setColumnAlignment(COLUMN_NUMBER, Qt::AlignVCenter | Qt::AlignRight);
-    setColumnAlignment(COLUMN_OFFSET, Qt::AlignVCenter | Qt::AlignRight);
-    setColumnAlignment(COLUMN_ADDRESS, Qt::AlignVCenter | Qt::AlignRight);
-    setColumnAlignment(COLUMN_REGION, Qt::AlignVCenter | Qt::AlignLeft);
-    setColumnAlignment(COLUMN_SIZE, Qt::AlignVCenter | Qt::AlignRight);
-    setColumnAlignment(COLUMN_METHOD, Qt::AlignVCenter | Qt::AlignLeft);
-    setColumnAlignment(COLUMN_TYPE, Qt::AlignVCenter | Qt::AlignLeft);
-    setColumnAlignment(COLUMN_INFO, Qt::AlignVCenter | Qt::AlignLeft);
+    setColumnAlignment(COLUMN_GENERIC_NUMBER, Qt::AlignVCenter | Qt::AlignRight);
+    setColumnAlignment(COLUMN_GENERIC_OFFSET, Qt::AlignVCenter | Qt::AlignRight);
+    setColumnAlignment(COLUMN_GENERIC_ADDRESS, Qt::AlignVCenter | Qt::AlignRight);
+    setColumnAlignment(COLUMN_GENERIC_REGION, Qt::AlignVCenter | Qt::AlignLeft);
+    setColumnAlignment(COLUMN_GENERIC_SIZE, Qt::AlignVCenter | Qt::AlignRight);
+    setColumnAlignment(COLUMN_GENERIC_METHOD, Qt::AlignVCenter | Qt::AlignLeft);
 
-    setColumnSymbolSize(COLUMN_NUMBER, QString::number(rowCount()).length());
-    setColumnSymbolSize(COLUMN_OFFSET, XBinary::getByteSizeFromWidthMode(g_modeOffset) * 2);
-    setColumnSymbolSize(COLUMN_ADDRESS, XBinary::getByteSizeFromWidthMode(g_modeAddress) * 2);
-    setColumnSymbolSize(COLUMN_REGION, 1);
-    setColumnSymbolSize(COLUMN_SIZE, XBinary::getByteSizeFromWidthMode(g_modeOffset) * 2);
-    setColumnSymbolSize(COLUMN_METHOD, 10);
-    setColumnSymbolSize(COLUMN_TYPE, 10);
+    if (pData->options.emode == XExtractor::EMODE_UNPACK) {
+        setColumnAlignment(COLUMN_UNPACK_NAME, Qt::AlignVCenter | Qt::AlignLeft);
+    } else if (pData->options.emode == XExtractor::EMODE_FORMAT) {
+        setColumnAlignment(COLUMN_FORMAT_TYPE, Qt::AlignVCenter | Qt::AlignLeft);
+        setColumnAlignment(COLUMN_FORMAT_INFO, Qt::AlignVCenter | Qt::AlignLeft);
+        setColumnAlignment(COLUMN_FORMAT_NAME, Qt::AlignVCenter | Qt::AlignLeft);
+    } else if (pData->options.emode == XExtractor::EMODE_RAW) {
+        setColumnAlignment(COLUMN_RAW_TYPE, Qt::AlignVCenter | Qt::AlignLeft);
+        setColumnAlignment(COLUMN_RAW_INFO, Qt::AlignVCenter | Qt::AlignLeft);
+    }
+
+    setColumnSymbolSize(COLUMN_GENERIC_NUMBER, QString::number(rowCount()).length());
+    setColumnSymbolSize(COLUMN_GENERIC_OFFSET, XBinary::getByteSizeFromWidthMode(g_modeOffset) * 2);
+    setColumnSymbolSize(COLUMN_GENERIC_ADDRESS, XBinary::getByteSizeFromWidthMode(g_modeAddress) * 2);
+    setColumnSymbolSize(COLUMN_GENERIC_REGION, 1);
+    setColumnSymbolSize(COLUMN_GENERIC_SIZE, XBinary::getByteSizeFromWidthMode(g_modeOffset) * 2);
+    setColumnSymbolSize(COLUMN_GENERIC_METHOD, 10);
+
+    if (pData->options.emode == XExtractor::EMODE_UNPACK) {
+        setColumnSymbolSize(COLUMN_UNPACK_NAME, 10);
+    } else if (pData->options.emode == XExtractor::EMODE_FORMAT) {
+        setColumnSymbolSize(COLUMN_FORMAT_TYPE, 10);
+        setColumnSymbolSize(COLUMN_FORMAT_INFO, 10);
+        setColumnSymbolSize(COLUMN_FORMAT_NAME, 10);
+    } else if (pData->options.emode == XExtractor::EMODE_RAW) {
+        setColumnSymbolSize(COLUMN_RAW_TYPE, 10);
+        setColumnSymbolSize(COLUMN_RAW_INFO, 10);
+    }
 
     qint32 nNumberOfRegions = pData->memoryMap.listRecords.count();
     qint32 nMaxRegionNameLength = 4;
@@ -55,7 +83,7 @@ XModel_Extractor::XModel_Extractor(XExtractor::DATA *pData, QObject *pParent) : 
         nMaxRegionNameLength = qMin(50, nMaxRegionNameLength);
     }
 
-    setColumnSymbolSize(COLUMN_REGION, nMaxRegionNameLength);
+    setColumnSymbolSize(COLUMN_GENERIC_REGION, nMaxRegionNameLength);
 }
 
 QVariant XModel_Extractor::data(const QModelIndex &index, int nRole) const
@@ -65,30 +93,45 @@ QVariant XModel_Extractor::data(const QModelIndex &index, int nRole) const
     if (index.isValid()) {
         qint32 nRow = index.row();
 
-        if (nRow >= 0) {
+        if ((nRow >= 0) && (g_pData->listRecords.count() > nRow)) {
             qint32 nColumn = index.column();
 
             if (nRole == Qt::DisplayRole) {
-                if (nColumn == COLUMN_NUMBER) {
+                if (nColumn == COLUMN_GENERIC_NUMBER) {
                     result = nRow;
-                } else if (nColumn == COLUMN_OFFSET) {
+                } else if (nColumn == COLUMN_GENERIC_OFFSET) {
                     result = XBinary::valueToHex(g_modeOffset, g_pData->listRecords.at(nRow).nOffset);
-                } else if (nColumn == COLUMN_ADDRESS) {
+                } else if (nColumn == COLUMN_GENERIC_ADDRESS) {
                     XADDR nAddress = XBinary::offsetToAddress(&(g_pData->memoryMap), g_pData->listRecords.at(nRow).nOffset);
                     if (nAddress != (XADDR)-1) {
                         result = XBinary::valueToHex(g_modeAddress, nAddress);
                     }
-                } else if (nColumn == COLUMN_REGION) {
+                } else if (nColumn == COLUMN_GENERIC_REGION) {
                     result = XBinary::getMemoryRecordByOffset(&(g_pData->memoryMap), g_pData->listRecords.at(nRow).nOffset).sName;
-                } else if (nColumn == COLUMN_SIZE) {
+                } else if (nColumn == COLUMN_GENERIC_SIZE) {
                     result = QString::number(g_pData->listRecords.at(nRow).nSize, 16);
-                } else if (nColumn == COLUMN_METHOD) {
+                } else if (nColumn == COLUMN_GENERIC_METHOD) {
                     result = XBinary::compressMethodToString(g_pData->listRecords.at(nRow).compressMethod);
-                    ;
-                } else if (nColumn == COLUMN_TYPE) {
-                    result = XBinary::fileTypeIdToString(g_pData->listRecords.at(nRow).fileType);
-                } else if (nColumn == COLUMN_INFO) {
-                    result = g_pData->listRecords.at(nRow).sString;
+                } else if (nColumn >= __COLUMN_GENERIC_SIZE) {
+                    if (g_pData->options.emode == XExtractor::EMODE_UNPACK) {
+                        if (nColumn == COLUMN_UNPACK_NAME) {
+                            result = g_pData->listRecords.at(nRow).sName;
+                        }
+                    } else if (g_pData->options.emode == XExtractor::EMODE_FORMAT) {
+                        if (nColumn == COLUMN_FORMAT_TYPE) {
+                            result = XBinary::fileTypeIdToString(g_pData->listRecords.at(nRow).fileType);
+                        } else if (nColumn == COLUMN_FORMAT_INFO) {
+                            result = g_pData->listRecords.at(nRow).sString;
+                        } else if (nColumn == COLUMN_FORMAT_NAME) {
+                            result = g_pData->listRecords.at(nRow).sName;
+                        }
+                    } else if (g_pData->options.emode == XExtractor::EMODE_RAW) {
+                        if (nColumn == COLUMN_RAW_TYPE) {
+                            result = XBinary::fileTypeIdToString(g_pData->listRecords.at(nRow).fileType);
+                        } else if (nColumn == COLUMN_RAW_INFO) {
+                            result = g_pData->listRecords.at(nRow).sString;
+                        }
+                    }
                 }
             } else if (nRole == Qt::TextAlignmentRole) {
                 result = getColumnAlignment(nColumn);
@@ -117,22 +160,38 @@ QVariant XModel_Extractor::headerData(int nSection, Qt::Orientation orientation,
 
     if (orientation == Qt::Horizontal) {
         if (nRole == Qt::DisplayRole) {
-            if (nSection == COLUMN_NUMBER) {
+            if (nSection == COLUMN_GENERIC_NUMBER) {
                 result = "#";
-            } else if (nSection == COLUMN_OFFSET) {
+            } else if (nSection == COLUMN_GENERIC_OFFSET) {
                 result = tr("Offset");
-            } else if (nSection == COLUMN_ADDRESS) {
+            } else if (nSection == COLUMN_GENERIC_ADDRESS) {
                 result = tr("Address");
-            } else if (nSection == COLUMN_REGION) {
+            } else if (nSection == COLUMN_GENERIC_REGION) {
                 result = tr("Region");
-            } else if (nSection == COLUMN_SIZE) {
+            } else if (nSection == COLUMN_GENERIC_SIZE) {
                 result = tr("Size");
-            } else if (nSection == COLUMN_METHOD) {
+            } else if (nSection == COLUMN_GENERIC_METHOD) {
                 result = tr("Method");
-            } else if (nSection == COLUMN_TYPE) {
-                result = tr("Type");
-            } else if (nSection == COLUMN_INFO) {
-                result = tr("Info");
+            } else if (nSection >= __COLUMN_GENERIC_SIZE) {
+                if (g_pData->options.emode == XExtractor::EMODE_UNPACK) {
+                    if (nSection == COLUMN_UNPACK_NAME) {
+                        result = tr("Name");
+                    }
+                } else if (g_pData->options.emode == XExtractor::EMODE_FORMAT) {
+                    if (nSection == COLUMN_FORMAT_TYPE) {
+                        result = tr("Type");
+                    } else if (nSection == COLUMN_FORMAT_INFO) {
+                        result = tr("Info");
+                    } else if (nSection == COLUMN_FORMAT_NAME) {
+                        result = tr("Name");
+                    }
+                } else if (g_pData->options.emode == XExtractor::EMODE_RAW) {
+                    if (nSection == COLUMN_RAW_TYPE) {
+                        result = tr("Type");
+                    } else if (nSection == COLUMN_RAW_INFO) {
+                        result = tr("Info");
+                    }
+                }
             }
         } else if (nRole == Qt::TextAlignmentRole) {
             result = getColumnAlignment(nSection);
@@ -146,7 +205,7 @@ XModel::SORT_METHOD XModel_Extractor::getSortMethod(qint32 nColumn)
 {
     SORT_METHOD result = SORT_METHOD_DEFAULT;
 
-    if ((nColumn == COLUMN_OFFSET) || (nColumn == COLUMN_OFFSET) || (nColumn == COLUMN_SIZE)) {
+    if ((nColumn == COLUMN_GENERIC_OFFSET) || (nColumn == COLUMN_GENERIC_OFFSET) || (nColumn == COLUMN_GENERIC_SIZE)) {
         result = SORT_METHOD_HEX;
     }
 
