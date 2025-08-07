@@ -506,34 +506,48 @@ void XExtractor::handleFormatUnpack(XBinary::FT fileType, bool bUnpack)
                 if (bUnpack) {
                     bAdd = true;
                 } else {
-                    XCompressedDevice compressedDevice;
-                    compressedDevice.setData(g_pDevice, fpart, g_pPdStruct);
+                    QSet<XBinary::FT> stFileTypes;
+                    XBinary::FT fileTypePref = (XBinary::FT)(fpart.mapProperties.value(XBinary::FPART_PROP_FILETYPE, XBinary::FT_UNKNOWN).toUInt());
+                    bool bNeedConvert = fpart.mapProperties.value(XBinary::FPART_PROP_NEEDCONVERT, false).toBool();
 
-                    if (compressedDevice.open(QIODevice::ReadOnly)) {
-                        QSet<XBinary::FT> stFileTypes = XFormats::getFileTypes(&compressedDevice, true, g_pPdStruct);
-                        XBinary::FT fileType = XBinary::_getPrefFileType(&stFileTypes);
-                        XBinary::FILEFORMATINFO formatInfo = XFormats::getFileFormatInfo(fileType, &compressedDevice, false, -1, g_pPdStruct);
+                    if (bNeedConvert) {
+                        stFileTypes.insert(fileTypePref);
 
-                        record.sExt = formatInfo.sExt;
-                        record.fileType = formatInfo.fileType;
-                        record.sString = XBinary::getFileFormatString(&formatInfo);
+                        record.sExt = fpart.mapProperties.value(XBinary::FPART_PROP_EXT, QString()).toString();
+                        record.fileType = fileTypePref;
+                        record.sString = fpart.mapProperties.value(XBinary::FPART_PROP_INFO, false).toString();
+                        record.bNeedConvert = true;
+                    } else {
+                        XCompressedDevice compressedDevice;
+                        compressedDevice.setData(g_pDevice, fpart, g_pPdStruct);
 
-                        if (g_pData->options.listFileTypes.contains(XBinary::FT_OTHER)) {
-                            bAdd = true;
-                        } else {
-                            qint32 nNumberOfFileTypes = g_pData->options.listFileTypes.count();
+                        if (compressedDevice.open(QIODevice::ReadOnly)) {
+                            stFileTypes = XFormats::getFileTypes(&compressedDevice, true, g_pPdStruct);
+                            fileTypePref = XBinary::_getPrefFileType(&stFileTypes);
 
-                            for (qint32 j = 0; j < nNumberOfFileTypes; j++) {
-                                XBinary::FT _fileType = g_pData->options.listFileTypes.at(j);
+                            XBinary::FILEFORMATINFO formatInfo = XFormats::getFileFormatInfo(fileTypePref, &compressedDevice, false, -1, g_pPdStruct);
 
-                                if (stFileTypes.contains(_fileType)) {
-                                    bAdd = true;
-                                    break;
-                                }
+                            record.sExt = formatInfo.sExt;
+                            record.fileType = formatInfo.fileType;
+                            record.sString = XBinary::getFileFormatString(&formatInfo);
+
+                            compressedDevice.close();
+                        }
+                    }
+
+                    if (g_pData->options.listFileTypes.contains(XBinary::FT_OTHER)) {
+                        bAdd = true;
+                    } else {
+                        qint32 nNumberOfFileTypes = g_pData->options.listFileTypes.count();
+
+                        for (qint32 j = 0; j < nNumberOfFileTypes; j++) {
+                            XBinary::FT _fileType = g_pData->options.listFileTypes.at(j);
+
+                            if (stFileTypes.contains(_fileType)) {
+                                bAdd = true;
+                                break;
                             }
                         }
-
-                        compressedDevice.close();
                     }
                 }
 

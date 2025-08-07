@@ -57,6 +57,7 @@ public:
         qint64 nOffset;
         qint64 nSize;
         XBinary::FT fileType;
+        bool bNeedConvert;
         XBinary::COMPRESS_METHOD compressMethod;
         QString sString;
         QString sName;  // For unpack mode
