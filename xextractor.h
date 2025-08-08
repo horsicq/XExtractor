@@ -57,6 +57,7 @@ public:
         qint64 nOffset;
         qint64 nSize;
         XBinary::FT fileType;
+        XBinary::FT fileTypeExtra;
         bool bNeedConvert;
         XBinary::COMPRESS_METHOD compressMethod;
         QString sString;

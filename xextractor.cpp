@@ -508,13 +508,14 @@ void XExtractor::handleFormatUnpack(XBinary::FT fileType, bool bUnpack)
                 } else {
                     QSet<XBinary::FT> stFileTypes;
                     XBinary::FT fileTypePref = (XBinary::FT)(fpart.mapProperties.value(XBinary::FPART_PROP_FILETYPE, XBinary::FT_UNKNOWN).toUInt());
-                    bool bNeedConvert = fpart.mapProperties.value(XBinary::FPART_PROP_NEEDCONVERT, false).toBool();
+                    XBinary::FT fileTypeExtra = (XBinary::FT)(fpart.mapProperties.value(XBinary::FPART_PROP_FILETYPE_EXTRA, XBinary::FT_UNKNOWN).toUInt());
 
-                    if (bNeedConvert) {
+                    if (fileTypeExtra != XBinary::FT_UNKNOWN) {
                         stFileTypes.insert(fileTypePref);
 
                         record.sExt = fpart.mapProperties.value(XBinary::FPART_PROP_EXT, QString()).toString();
                         record.fileType = fileTypePref;
+                        record.fileTypeExtra = fileTypeExtra;
                         record.sString = fpart.mapProperties.value(XBinary::FPART_PROP_INFO, false).toString();
                         record.bNeedConvert = true;
                     } else {
