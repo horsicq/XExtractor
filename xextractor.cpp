@@ -498,7 +498,8 @@ void XExtractor::handleFormatUnpack(XBinary::FT fileType, bool bUnpack)
                 RECORD record = {};
                 record.nSize = fpart.nFileSize;
 
-                record.compressMethod = (XBinary::COMPRESS_METHOD)fpart.mapProperties.value(XBinary::FPART_PROP_COMPRESSMETHOD, XBinary::COMPRESS_METHOD_UNKNOWN).toUInt();
+                record.compressMethod =
+                    (XBinary::COMPRESS_METHOD)fpart.mapProperties.value(XBinary::FPART_PROP_COMPRESSMETHOD, XBinary::COMPRESS_METHOD_UNKNOWN).toUInt();
                 record.nOffset = fpart.nFileOffset;
 
                 record.sName = sPrefName;
