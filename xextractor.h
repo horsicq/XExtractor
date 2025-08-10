@@ -97,9 +97,9 @@ public slots:
     void process();
 
 private:
-    QIODevice *g_pDevice;
-    DATA *g_pData;
-    XBinary::PDSTRUCT *g_pPdStruct;
+    QIODevice *m_pDevice;
+    DATA *m_pData;
+    XBinary::PDSTRUCT *m_pPdStruct;
 };
 
 #endif  // XEXTRACTOR_H
