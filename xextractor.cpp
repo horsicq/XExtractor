@@ -282,48 +282,56 @@ void XExtractor::handleSearch(qint32 nGlobalIndex, XBinary *pBinary, DATA *pData
                     nOffset += 1;
                 } else {
                     qint64 nResSize = 0;
+                    XBinary::FT _fileType = XBinary::FT_UNKNOWN;
+                    qint64 nFileFormatSize = 0;
 
-                    SubDevice subdevice(m_pDevice, _nOffset, -1);
+                    {
+                        SubDevice subdevice(m_pDevice, _nOffset, -1);
 
-                    if (subdevice.open(QIODevice::ReadOnly)) {
-                        XBinary::FILEFORMATINFO formatInfo = XFormats::getFileFormatInfo(fileType, &subdevice, false, -1, pPdStruct);
-
-                        if (formatInfo.bIsValid) {
-                            QSet<XBinary::FT> stFT = XFormats::getFileTypes(&subdevice, true, pPdStruct);
-                            XBinary::FT _fileType = XBinary::_getPrefFileType(&stFT);
-                            qint64 nFileFormatSize = XFormats::getFileFormatSize(_fileType, &subdevice, false, -1, pPdStruct);
-
-                            XBinary::FILEFORMATINFO _formatInfo = XFormats::getFileFormatInfo(_fileType, &subdevice, false, -1, pPdStruct);
-
-                            if (_formatInfo.bIsValid) {
-                                formatInfo = _formatInfo;
+                        if (subdevice.open(QIODevice::ReadOnly)) {
+                            if (XFormats::isValid(fileType, &subdevice, false, -1, pPdStruct)) {
+                                QSet<XBinary::FT> stFT = XFormats::getFileTypes(&subdevice, true, pPdStruct);
+                                _fileType = XBinary::_getPrefFileType(&stFT);
+                                nFileFormatSize = XFormats::getFileFormatSize(_fileType, &subdevice, false, -1, pPdStruct);
                             }
 
-                            RECORD record = {};
+                            subdevice.close();
+                        }
+                    }
 
-                            record.compressMethod = XArchive::COMPRESS_METHOD_STORE;
-                            record.nOffset = _nOffset;
-                            record.nSize = nFileFormatSize;
+                    if (nFileFormatSize) {
+                        SubDevice subdevice(m_pDevice, _nOffset, nFileFormatSize);
 
-                            if (record.nSize) {
-                                record.sString = XBinary::getFileFormatString(&formatInfo);
-                                record.sExt = formatInfo.sExt;
-                                record.fileType = formatInfo.fileType;
+                        if (subdevice.open(QIODevice::ReadOnly)) {
+                            XBinary::FILEFORMATINFO formatInfo = XFormats::getFileFormatInfo(_fileType, &subdevice, false, -1, pPdStruct);
 
-                                // Fix if more than the device size
-                                if ((record.nOffset + record.nSize) > m_pDevice->size()) {
-                                    record.nSize = (m_pDevice->size() - record.nOffset);
+                            if (formatInfo.bIsValid) {
+                                RECORD record = {};
+
+                                record.compressMethod = XArchive::COMPRESS_METHOD_STORE;
+                                record.nOffset = _nOffset;
+                                record.nSize = nFileFormatSize;
+
+                                if (record.nSize) {
+                                    record.sString = XBinary::getFileFormatString(&formatInfo);
+                                    record.sExt = formatInfo.sExt;
+                                    record.fileType = formatInfo.fileType;
+
+                                    // Fix if more than the device size
+                                    if ((record.nOffset + record.nSize) > m_pDevice->size()) {
+                                        record.nSize = (m_pDevice->size() - record.nOffset);
+                                    }
+
+                                    m_pData->listRecords.append(record);
+
+                                    nFound++;
                                 }
 
-                                m_pData->listRecords.append(record);
-
-                                nFound++;
+                                nResSize = record.nSize;
                             }
 
-                            nResSize = record.nSize;
+                            subdevice.close();
                         }
-
-                        subdevice.close();
                     }
 
                     if (nResSize == 0) {
