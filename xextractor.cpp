@@ -159,7 +159,7 @@ bool XExtractor::isFormatModeAvailable(XBinary::FT fileType)
     bool bResult = false;
 
     if ((fileType == XBinary::FT_ZIP) || (fileType == XBinary::FT_JAR) || (fileType == XBinary::FT_APK) || (fileType == XBinary::FT_APKS) ||
-        (fileType == XBinary::FT_PDF)) {
+        (fileType == XBinary::FT_PDF) || (fileType == XBinary::FT_TAR)) {
         bResult = true;
     }
 
@@ -171,7 +171,7 @@ bool XExtractor::isUnpackModeAvailable(XBinary::FT fileType)
     bool bResult = false;
 
     if ((fileType == XBinary::FT_ZIP) || (fileType == XBinary::FT_JAR) || (fileType == XBinary::FT_APK) || (fileType == XBinary::FT_APKS) ||
-        (fileType == XBinary::FT_PDF)) {
+        (fileType == XBinary::FT_PDF) || (fileType == XBinary::FT_TAR)) {
         bResult = true;
     }
 
@@ -369,6 +369,7 @@ void XExtractor::handleSearch(qint32 nGlobalIndex, XBinary *pBinary, DATA *pData
 
 void XExtractor::handleRaw()
 {
+    m_pData->emode = XExtractor::EMODE_RAW;
     m_pData->listRecords.clear();
 
     qint32 nSearchCount = m_pData->options.listFileTypes.count();
@@ -473,13 +474,12 @@ void XExtractor::handleRaw()
 
 void XExtractor::handleFormatUnpack(XBinary::FT fileType, bool bUnpack)
 {
+    m_pData->emode = (bUnpack ? EMODE_UNPACK : EMODE_FORMAT);
     m_pData->listRecords.clear();
 
     QList<XBinary::FPART> listParts;
 
-    if (fileType == XBinary::FT_ZIP) {
-        listParts = XFormats::getFileParts(fileType, m_pDevice, XBinary::FILEPART_STREAM, -1, false, -1, m_pPdStruct);
-    } else if (fileType == XBinary::FT_PDF) {
+    if ((fileType == XBinary::FT_ZIP) || (fileType == XBinary::FT_PDF) || (fileType == XBinary::FT_TAR)) {
         listParts = XFormats::getFileParts(fileType, m_pDevice, XBinary::FILEPART_STREAM, -1, false, -1, m_pPdStruct);
     }
 

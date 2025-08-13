@@ -26,11 +26,11 @@ XModel_Extractor::XModel_Extractor(XExtractor::DATA *pData, QObject *pParent) : 
 
     _setRowCount(pData->listRecords.count());
 
-    if (pData->options.emode == XExtractor::EMODE_UNPACK) {
+    if (pData->emode == XExtractor::EMODE_UNPACK) {
         _setColumnCount(__COLUMN_UNPACK_SIZE);
-    } else if (pData->options.emode == XExtractor::EMODE_FORMAT) {
+    } else if (pData->emode == XExtractor::EMODE_FORMAT) {
         _setColumnCount(__COLUMN_FORMAT_SIZE);
-    } else if (pData->options.emode == XExtractor::EMODE_RAW) {
+    } else if (pData->emode == XExtractor::EMODE_RAW) {
         _setColumnCount(__COLUMN_RAW_SIZE);
     } else {
         _setColumnCount(__COLUMN_GENERIC_SIZE);
@@ -46,13 +46,13 @@ XModel_Extractor::XModel_Extractor(XExtractor::DATA *pData, QObject *pParent) : 
     setColumnAlignment(COLUMN_GENERIC_SIZE, Qt::AlignVCenter | Qt::AlignRight);
     setColumnAlignment(COLUMN_GENERIC_METHOD, Qt::AlignVCenter | Qt::AlignLeft);
 
-    if (pData->options.emode == XExtractor::EMODE_UNPACK) {
+    if (pData->emode == XExtractor::EMODE_UNPACK) {
         setColumnAlignment(COLUMN_UNPACK_NAME, Qt::AlignVCenter | Qt::AlignLeft);
-    } else if (pData->options.emode == XExtractor::EMODE_FORMAT) {
+    } else if (pData->emode == XExtractor::EMODE_FORMAT) {
         setColumnAlignment(COLUMN_FORMAT_TYPE, Qt::AlignVCenter | Qt::AlignLeft);
         setColumnAlignment(COLUMN_FORMAT_INFO, Qt::AlignVCenter | Qt::AlignLeft);
         setColumnAlignment(COLUMN_FORMAT_NAME, Qt::AlignVCenter | Qt::AlignLeft);
-    } else if (pData->options.emode == XExtractor::EMODE_RAW) {
+    } else if (pData->emode == XExtractor::EMODE_RAW) {
         setColumnAlignment(COLUMN_RAW_TYPE, Qt::AlignVCenter | Qt::AlignLeft);
         setColumnAlignment(COLUMN_RAW_INFO, Qt::AlignVCenter | Qt::AlignLeft);
     }
@@ -64,13 +64,13 @@ XModel_Extractor::XModel_Extractor(XExtractor::DATA *pData, QObject *pParent) : 
     setColumnSymbolSize(COLUMN_GENERIC_SIZE, XBinary::getByteSizeFromWidthMode(g_modeOffset) * 2);
     setColumnSymbolSize(COLUMN_GENERIC_METHOD, 10);
 
-    if (pData->options.emode == XExtractor::EMODE_UNPACK) {
+    if (pData->emode == XExtractor::EMODE_UNPACK) {
         setColumnSymbolSize(COLUMN_UNPACK_NAME, 10);
-    } else if (pData->options.emode == XExtractor::EMODE_FORMAT) {
+    } else if (pData->emode == XExtractor::EMODE_FORMAT) {
         setColumnSymbolSize(COLUMN_FORMAT_TYPE, 10);
         setColumnSymbolSize(COLUMN_FORMAT_INFO, 10);
         setColumnSymbolSize(COLUMN_FORMAT_NAME, 10);
-    } else if (pData->options.emode == XExtractor::EMODE_RAW) {
+    } else if (pData->emode == XExtractor::EMODE_RAW) {
         setColumnSymbolSize(COLUMN_RAW_TYPE, 10);
         setColumnSymbolSize(COLUMN_RAW_INFO, 10);
     }
@@ -113,11 +113,11 @@ QVariant XModel_Extractor::data(const QModelIndex &index, int nRole) const
                 } else if (nColumn == COLUMN_GENERIC_METHOD) {
                     result = XBinary::compressMethodToString(g_pData->listRecords.at(nRow).compressMethod);
                 } else if (nColumn >= __COLUMN_GENERIC_SIZE) {
-                    if (g_pData->options.emode == XExtractor::EMODE_UNPACK) {
+                    if (g_pData->emode == XExtractor::EMODE_UNPACK) {
                         if (nColumn == COLUMN_UNPACK_NAME) {
                             result = g_pData->listRecords.at(nRow).sName;
                         }
-                    } else if (g_pData->options.emode == XExtractor::EMODE_FORMAT) {
+                    } else if (g_pData->emode == XExtractor::EMODE_FORMAT) {
                         if (nColumn == COLUMN_FORMAT_TYPE) {
                             QString sFileType = XBinary::fileTypeIdToString(g_pData->listRecords.at(nRow).fileType);
                             if (g_pData->listRecords.at(nRow).fileTypeExtra != XBinary::FT_UNKNOWN)
@@ -128,7 +128,7 @@ QVariant XModel_Extractor::data(const QModelIndex &index, int nRole) const
                         } else if (nColumn == COLUMN_FORMAT_NAME) {
                             result = g_pData->listRecords.at(nRow).sName;
                         }
-                    } else if (g_pData->options.emode == XExtractor::EMODE_RAW) {
+                    } else if (g_pData->emode == XExtractor::EMODE_RAW) {
                         if (nColumn == COLUMN_RAW_TYPE) {
                             QString sFileType = XBinary::fileTypeIdToString(g_pData->listRecords.at(nRow).fileType);
                             if (g_pData->listRecords.at(nRow).fileTypeExtra != XBinary::FT_UNKNOWN)
@@ -179,11 +179,11 @@ QVariant XModel_Extractor::headerData(int nSection, Qt::Orientation orientation,
             } else if (nSection == COLUMN_GENERIC_METHOD) {
                 result = tr("Method");
             } else if (nSection >= __COLUMN_GENERIC_SIZE) {
-                if (g_pData->options.emode == XExtractor::EMODE_UNPACK) {
+                if (g_pData->emode == XExtractor::EMODE_UNPACK) {
                     if (nSection == COLUMN_UNPACK_NAME) {
                         result = tr("Name");
                     }
-                } else if (g_pData->options.emode == XExtractor::EMODE_FORMAT) {
+                } else if (g_pData->emode == XExtractor::EMODE_FORMAT) {
                     if (nSection == COLUMN_FORMAT_TYPE) {
                         result = tr("Type");
                     } else if (nSection == COLUMN_FORMAT_INFO) {
@@ -191,7 +191,7 @@ QVariant XModel_Extractor::headerData(int nSection, Qt::Orientation orientation,
                     } else if (nSection == COLUMN_FORMAT_NAME) {
                         result = tr("Name");
                     }
-                } else if (g_pData->options.emode == XExtractor::EMODE_RAW) {
+                } else if (g_pData->emode == XExtractor::EMODE_RAW) {
                     if (nSection == COLUMN_RAW_TYPE) {
                         result = tr("Type");
                     } else if (nSection == COLUMN_RAW_INFO) {

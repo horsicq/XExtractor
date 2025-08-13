@@ -68,6 +68,7 @@ public:
     struct DATA {
         OPTIONS options;
         XBinary::_MEMORY_MAP memoryMap;
+        EMODE emode;
         QVector<RECORD> listRecords;
     };
 
