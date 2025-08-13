@@ -478,18 +478,18 @@ void XExtractor::handleFormatUnpack(XBinary::FT fileType, bool bUnpack)
     QList<XBinary::FPART> listParts;
 
     if (fileType == XBinary::FT_ZIP) {
-    listParts = XFormats::getFileParts(fileType, m_pDevice, XBinary::FILEPART_STREAM, -1, false, -1, m_pPdStruct);
+        listParts = XFormats::getFileParts(fileType, m_pDevice, XBinary::FILEPART_STREAM, -1, false, -1, m_pPdStruct);
     } else if (fileType == XBinary::FT_PDF) {
-    listParts = XFormats::getFileParts(fileType, m_pDevice, XBinary::FILEPART_STREAM, -1, false, -1, m_pPdStruct);
+        listParts = XFormats::getFileParts(fileType, m_pDevice, XBinary::FILEPART_STREAM, -1, false, -1, m_pPdStruct);
     }
 
     qint32 nNumberOfParts = listParts.count();
 
     if (nNumberOfParts > 0) {
-    qint32 nGlobalIndex = XBinary::getFreeIndex(m_pPdStruct);
-    XBinary::setPdStructInit(m_pPdStruct, nGlobalIndex, nNumberOfParts);
+        qint32 nGlobalIndex = XBinary::getFreeIndex(m_pPdStruct);
+        XBinary::setPdStructInit(m_pPdStruct, nGlobalIndex, nNumberOfParts);
 
-    for (qint32 i = 0; (i < nNumberOfParts) && XBinary::isPdStructNotCanceled(m_pPdStruct); i++) {
+        for (qint32 i = 0; (i < nNumberOfParts) && XBinary::isPdStructNotCanceled(m_pPdStruct); i++) {
             XBinary::FPART fpart = listParts.at(i);
 
             QString sPrefName = fpart.sOriginalName;
@@ -576,7 +576,7 @@ void XExtractor::handleFormatUnpack(XBinary::FT fileType, bool bUnpack)
             XBinary::setPdStructCurrentIncrement(m_pPdStruct, nGlobalIndex);
         }
 
-    XBinary::setPdStructFinished(m_pPdStruct, nGlobalIndex);
+        XBinary::setPdStructFinished(m_pPdStruct, nGlobalIndex);
     }
 }
 
