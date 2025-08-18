@@ -63,42 +63,45 @@ bool XExtractor::processFile(const QString &sFileName, DATA *pData, XBinary::PDS
     return bResult;
 }
 
-QList<XBinary::FT> XExtractor::getAvailableFileTypes()
+QList<XBinary::FT> XExtractor::getAvailableFileTypes(EMODE emode)
 {
     QList<XBinary::FT> listResult;
 
-    listResult.append(XBinary::FT_PE);
-    listResult.append(XBinary::FT_ELF);
-    listResult.append(XBinary::FT_MACHOFAT);
-    listResult.append(XBinary::FT_MACHO);
-    listResult.append(XBinary::FT_PDF);
-    listResult.append(XBinary::FT_PNG);
-    listResult.append(XBinary::FT_JPEG);
-    listResult.append(XBinary::FT_TIFF);
-    listResult.append(XBinary::FT_BMP);
-    listResult.append(XBinary::FT_GIF);
-    listResult.append(XBinary::FT_ICO);
-    listResult.append(XBinary::FT_DEX);
-    listResult.append(XBinary::FT_ZIP);
-    listResult.append(XBinary::FT_RAR);
-    listResult.append(XBinary::FT_GZIP);
-    listResult.append(XBinary::FT_ZLIB);
-    listResult.append(XBinary::FT_7Z);
-    listResult.append(XBinary::FT_CAB);
-    listResult.append(XBinary::FT_MP3);
-    listResult.append(XBinary::FT_MP4);
-    listResult.append(XBinary::FT_RIFF);
-    listResult.append(XBinary::FT_LE);
-    listResult.append(XBinary::FT_NE);
-    listResult.append(XBinary::FT_AMIGAHUNK);
-    listResult.append(XBinary::FT_JAVACLASS);
-    listResult.append(XBinary::FT_SZDD);
-    listResult.append(XBinary::FT_BZIP2);
-    listResult.append(XBinary::FT_LHA);
-    listResult.append(XBinary::FT_DJVU);
-    // listResult.append(XBinary::FT_CFBF);
-    // listResult.append(XBinary::FT_SIGNATURE); // TODO
-    listResult.append(XBinary::FT_OTHER);
+    if ((emode == EMODE_RAW) || (emode == EMODE_FORMAT)) {
+        listResult.append(XBinary::FT_PE);
+        listResult.append(XBinary::FT_ELF);
+        listResult.append(XBinary::FT_MACHOFAT);
+        listResult.append(XBinary::FT_MACHO);
+        listResult.append(XBinary::FT_PDF);
+        listResult.append(XBinary::FT_PNG);
+        listResult.append(XBinary::FT_JPEG);
+        listResult.append(XBinary::FT_TIFF);
+        listResult.append(XBinary::FT_BMP);
+        listResult.append(XBinary::FT_GIF);
+        listResult.append(XBinary::FT_ICO);
+        listResult.append(XBinary::FT_DEX);
+        listResult.append(XBinary::FT_ZIP);
+        listResult.append(XBinary::FT_RAR);
+        listResult.append(XBinary::FT_GZIP);
+        listResult.append(XBinary::FT_ZLIB);
+        listResult.append(XBinary::FT_7Z);
+        listResult.append(XBinary::FT_CAB);
+        listResult.append(XBinary::FT_MP3);
+        listResult.append(XBinary::FT_MP4);
+        listResult.append(XBinary::FT_RIFF);
+        listResult.append(XBinary::FT_LE);
+        listResult.append(XBinary::FT_NE);
+        listResult.append(XBinary::FT_AMIGAHUNK);
+        listResult.append(XBinary::FT_JAVACLASS);
+        listResult.append(XBinary::FT_SZDD);
+        listResult.append(XBinary::FT_BZIP2);
+        listResult.append(XBinary::FT_LHA);
+        listResult.append(XBinary::FT_DJVU);
+    }
+
+    if (emode == EMODE_FORMAT) {
+        listResult.append(XBinary::FT_BINARY);
+    }
 
     return listResult;
 }
@@ -198,7 +201,7 @@ QVector<XExtractor::RECORD> XExtractor::scanDevice(QIODevice *pDevice, OPTIONS o
 void XExtractor::handleSearch(qint32 nGlobalIndex, XBinary *pBinary, DATA *pData, XBinary::FT fileType, const QString &sSignature, qint32 nDelta,
                               XBinary::PDSTRUCT *pPdStruct)
 {
-    if (m_pData->options.listFileTypes.contains(fileType)) {
+    if (m_pData->options.listFileTypes.contains(fileType) || m_pData->options.bAllTypes) {
         XBinary::setPdStructStatus(pPdStruct, nGlobalIndex, XBinary::fileTypeIdToString(fileType));
 
         bool bNextByte = true;
@@ -372,21 +375,27 @@ void XExtractor::handleRaw()
     m_pData->emode = XExtractor::EMODE_RAW;
     m_pData->listRecords.clear();
 
-    qint32 nSearchCount = m_pData->options.listFileTypes.count();
+    qint32 nSearchCount = 0;
 
-    if (m_pData->options.listFileTypes.contains(XBinary::FT_ICO)) {
+    if (m_pData->options.bAllTypes) {
+        nSearchCount = getAvailableFileTypes(XExtractor::EMODE_RAW).count();
+    } else {
+        nSearchCount = m_pData->options.listFileTypes.count();
+    }
+
+    if (m_pData->options.listFileTypes.contains(XBinary::FT_ICO) || (m_pData->options.bAllTypes)) {
         nSearchCount++;
     }
 
-    if (m_pData->options.listFileTypes.contains(XBinary::FT_MACHO)) {
+    if (m_pData->options.listFileTypes.contains(XBinary::FT_MACHO) || (m_pData->options.bAllTypes)) {
         nSearchCount += 3;
     }
 
-    if (m_pData->options.listFileTypes.contains(XBinary::FT_MACHOFAT)) {
+    if (m_pData->options.listFileTypes.contains(XBinary::FT_MACHOFAT) || (m_pData->options.bAllTypes)) {
         nSearchCount++;
     }
 
-    if (m_pData->options.listFileTypes.contains(XBinary::FT_TIFF)) {
+    if (m_pData->options.listFileTypes.contains(XBinary::FT_TIFF) || (m_pData->options.bAllTypes)) {
         nSearchCount++;
     }
 
@@ -394,19 +403,19 @@ void XExtractor::handleRaw()
     //     nSearchCount += 2;
     // }
 
-    if (m_pData->options.listFileTypes.contains(XBinary::FT_AMIGAHUNK)) {
+    if (m_pData->options.listFileTypes.contains(XBinary::FT_AMIGAHUNK) || (m_pData->options.bAllTypes)) {
         nSearchCount++;
     }
 
-    if (m_pData->options.listFileTypes.contains(XBinary::FT_DJVU)) {
+    if (m_pData->options.listFileTypes.contains(XBinary::FT_DJVU) || (m_pData->options.bAllTypes)) {
         nSearchCount++;
     }
 
-    if (m_pData->options.listFileTypes.contains(XBinary::FT_LHA)) {
+    if (m_pData->options.listFileTypes.contains(XBinary::FT_LHA) || (m_pData->options.bAllTypes)) {
         nSearchCount += 2;
     }
 
-    if (m_pData->options.listFileTypes.contains(XBinary::FT_BZIP2)) {
+    if (m_pData->options.listFileTypes.contains(XBinary::FT_BZIP2) || (m_pData->options.bAllTypes)) {
         nSearchCount++;
     }
 
@@ -550,7 +559,7 @@ void XExtractor::handleFormatUnpack(XBinary::FT fileType, bool bUnpack)
                         }
                     }
 
-                    if (m_pData->options.listFileTypes.contains(XBinary::FT_OTHER)) {
+                    if (m_pData->options.bAllTypes) {
                         bAdd = true;
                     } else {
                         qint32 nNumberOfFileTypes = m_pData->options.listFileTypes.count();

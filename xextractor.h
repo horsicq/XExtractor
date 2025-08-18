@@ -41,6 +41,7 @@ public:
         XBinary::FT fileType;
         // XBinary::MAPMODE mapMode;
         QList<XBinary::FT> listFileTypes;
+        bool bAllTypes;  // If true, then all file types will be used for scan
         qint32 nLimit;
         bool bDeepScan;
         EMODE emode;  // RAW, FORMAT, HEURISTIC, UNPACK
@@ -77,7 +78,7 @@ public:
     void setData(QIODevice *pDevice, DATA *pData, XBinary::PDSTRUCT *pPdStruct);
     bool processFile(const QString &sFileName, DATA *pData, XBinary::PDSTRUCT *pPdStruct);
 
-    static QList<XBinary::FT> getAvailableFileTypes();
+    static QList<XBinary::FT> getAvailableFileTypes(EMODE emode);
     static XExtractor::OPTIONS getDefaultOptions();
     static QVector<RECORD> scanDevice(QIODevice *pDevice, OPTIONS options, XBinary::PDSTRUCT *pPdStruct);
 
