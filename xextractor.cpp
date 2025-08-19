@@ -637,12 +637,12 @@ void XExtractor::process()
     }
 
     if (m_pData->options.bExtract) {
-        if (m_pData->options.emode == EMODE_UNPACK) {
+        if (m_pData->emode == EMODE_UNPACK) {
             XFormats xformats;
             _connect(&xformats);
             QString sOutputDirectory = m_pData->options.sOutputDirectory + QDir::separator() + XBinary::getDeviceFileBaseName(m_pDevice);
             xformats.unpackDeviceToFolder(fileType, m_pDevice, sOutputDirectory, m_pPdStruct);
-        } else if ((m_pData->options.emode == EMODE_FORMAT) || (m_pData->options.emode == EMODE_RAW)) {
+        } else if ((m_pData->emode == EMODE_FORMAT) || (m_pData->emode == EMODE_RAW)) {
             QList<XBinary::FPART> listParts;
 
             qint32 nFreeIndex = XBinary::getFreeIndex(m_pPdStruct);
