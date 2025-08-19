@@ -60,10 +60,11 @@ public:
         XBinary::FT fileType;
         XBinary::FT fileTypeExtra;
         bool bNeedConvert;
-        XBinary::COMPRESS_METHOD compressMethod;
+        QMap<XBinary::FPART_PROP, QVariant> mapProperties;
         QString sString;
         QString sName;  // For unpack mode
         QString sExt;
+        quint32 nCRC;
     };
 
     struct DATA {

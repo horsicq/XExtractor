@@ -311,7 +311,7 @@ void XExtractor::handleSearch(qint32 nGlobalIndex, XBinary *pBinary, DATA *pData
                             if (formatInfo.bIsValid) {
                                 RECORD record = {};
 
-                                record.compressMethod = XArchive::COMPRESS_METHOD_STORE;
+                                record.mapProperties.insert(XBinary::FPART_PROP_COMPRESSMETHOD, XArchive::COMPRESS_METHOD_STORE);
                                 record.nOffset = _nOffset;
                                 record.nSize = nFileFormatSize;
 
@@ -320,10 +320,12 @@ void XExtractor::handleSearch(qint32 nGlobalIndex, XBinary *pBinary, DATA *pData
                                     record.sExt = formatInfo.sExt;
                                     record.fileType = formatInfo.fileType;
 
-                                    // Fix if more than the device size
-                                    if ((record.nOffset + record.nSize) > m_pDevice->size()) {
-                                        record.nSize = (m_pDevice->size() - record.nOffset);
-                                    }
+                                    // // Fix if more than the device size
+                                    // if ((record.nOffset + record.nSize) > m_pDevice->size()) {
+                                    //     record.nSize = (m_pDevice->size() - record.nOffset);
+                                    // }
+
+                                    record.nCRC = XBinary::_getCRC32(&subdevice, pPdStruct);
 
                                     m_pData->listRecords.append(record);
 
@@ -488,8 +490,12 @@ void XExtractor::handleFormatUnpack(XBinary::FT fileType, bool bUnpack)
 
     QList<XBinary::FPART> listParts;
 
-    if ((fileType == XBinary::FT_ZIP) || (fileType == XBinary::FT_JAR) || (fileType == XBinary::FT_APK) || (fileType == XBinary::FT_APKS) ||
-        (fileType == XBinary::FT_PDF) || (fileType == XBinary::FT_TAR)) {
+    if ((fileType == XBinary::FT_ZIP) ||
+        (fileType == XBinary::FT_JAR) ||
+        (fileType == XBinary::FT_APK) ||
+        (fileType == XBinary::FT_APKS) ||
+        (fileType == XBinary::FT_PDF) ||
+        (fileType == XBinary::FT_TAR)) {
         listParts = XFormats::getFileParts(fileType, m_pDevice, XBinary::FILEPART_STREAM, -1, false, -1, m_pPdStruct);
     }
 
@@ -514,12 +520,9 @@ void XExtractor::handleFormatUnpack(XBinary::FT fileType, bool bUnpack)
 
             if (fpart.nFileSize > 0) {
                 RECORD record = {};
-                record.nSize = fpart.nFileSize;
-
-                record.compressMethod =
-                    (XBinary::COMPRESS_METHOD)fpart.mapProperties.value(XBinary::FPART_PROP_COMPRESSMETHOD, XBinary::COMPRESS_METHOD_UNKNOWN).toUInt();
                 record.nOffset = fpart.nFileOffset;
-
+                record.nSize = fpart.nFileSize;
+                record.mapProperties = fpart.mapProperties;
                 record.sName = sPrefName;
 
                 if (bUnpack) {
@@ -550,6 +553,7 @@ void XExtractor::handleFormatUnpack(XBinary::FT fileType, bool bUnpack)
                             record.sExt = formatInfo.sExt;
                             record.fileType = formatInfo.fileType;
                             record.sString = XBinary::getFileFormatString(&formatInfo);
+                            record.nCRC = XBinary::_getCRC32(&compressedDevice, m_pPdStruct);
 
                             compressedDevice.close();
                         }
@@ -570,8 +574,6 @@ void XExtractor::handleFormatUnpack(XBinary::FT fileType, bool bUnpack)
                         }
                     }
                 }
-
-                bAdd = true;
 
                 if (bAdd) {
                     // Fix if more than the device size
@@ -638,7 +640,59 @@ void XExtractor::process()
         if (m_pData->options.emode == EMODE_UNPACK) {
             XFormats xformats;
             _connect(&xformats);
-            xformats.unpackDeviceToFolder(fileType, m_pDevice, m_pData->options.sOutputDirectory, m_pPdStruct);
+            QString sOutputDirectory = m_pData->options.sOutputDirectory + QDir::separator() + XBinary::getDeviceFileBaseName(m_pDevice);
+            xformats.unpackDeviceToFolder(fileType, m_pDevice, sOutputDirectory, m_pPdStruct);
+        } else if ((m_pData->options.emode == EMODE_FORMAT) || (m_pData->options.emode == EMODE_RAW)) {
+            QList<XBinary::FPART> listParts;
+
+            qint32 nFreeIndex = XBinary::getFreeIndex(m_pPdStruct);
+            qint32 nNumberOfRecords = m_pData->listRecords.count();
+            XBinary::setPdStructInit(m_pPdStruct, nFreeIndex, nNumberOfRecords);
+
+            for (qint32 i = 0; (i < nNumberOfRecords) && XBinary::isPdStructNotCanceled(m_pPdStruct); i++) {
+                QString sName = XBinary::convertFileNameSymbols(m_pData->listRecords.at(i).sName);
+                QString sExt = QFileInfo(sName).completeSuffix();
+
+                if (sExt == "") {
+                    sExt = m_pData->listRecords.at(i).sExt;
+                }
+
+                if (sName != "") {
+                    sName += "_";
+                }
+                sName += XBinary::valueToHex(m_pData->listRecords.at(i).nCRC);
+
+                if (sExt != "") {
+                    sName += ".";
+                    sName += sExt;
+                }
+
+                sName = XBinary::fileTypeIdToFtString(m_pData->listRecords.at(i).fileType) + QDir::separator() + sName;
+
+                if (m_pData->listRecords.at(i).bNeedConvert) {
+                    // TODO
+                } else {
+                    XBinary::FPART part = {};
+                    part.mapProperties = m_pData->listRecords.at(i).mapProperties;
+                    part.nFileOffset = m_pData->listRecords.at(i).nOffset;
+                    part.nFileSize = m_pData->listRecords.at(i).nSize;
+                    part.sName = m_pData->listRecords.at(i).sString;
+                    part.sOriginalName = sName;
+                    // part.sExt = m_pData->listRecords.at(i).sExt;
+                    // part.fileType = m_pData->listRecords.at(i).fileType;
+
+                    listParts.append(part);
+                }
+            }
+
+            if (listParts.count()) {
+                XDecompress xDecompress;
+                _connect(&xDecompress);
+
+                xDecompress.unpackFilePartsToFolder(&listParts, m_pDevice, m_pData->options.sOutputDirectory, m_pPdStruct);
+            }
+
+            XBinary::setPdStructFinished(m_pPdStruct, nFreeIndex);
         }
     }
 
