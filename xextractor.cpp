@@ -162,7 +162,7 @@ bool XExtractor::isFormatModeAvailable(XBinary::FT fileType)
     bool bResult = false;
 
     if ((fileType == XBinary::FT_ZIP) || (fileType == XBinary::FT_JAR) || (fileType == XBinary::FT_APK) || (fileType == XBinary::FT_APKS) ||
-        (fileType == XBinary::FT_PDF) || (fileType == XBinary::FT_TAR)) {
+        (fileType == XBinary::FT_PDF) || (fileType == XBinary::FT_TAR) || (fileType == XBinary::FT_PE32) || (fileType == XBinary::FT_PE64)) {
         bResult = true;
     }
 
@@ -497,6 +497,9 @@ void XExtractor::handleFormatUnpack(XBinary::FT fileType, bool bUnpack)
         (fileType == XBinary::FT_PDF) ||
         (fileType == XBinary::FT_TAR)) {
         listParts = XFormats::getFileParts(fileType, m_pDevice, XBinary::FILEPART_STREAM, -1, false, -1, m_pPdStruct);
+    } else if ((fileType == XBinary::FT_PE32) ||
+               (fileType == XBinary::FT_PE64)) {
+        listParts = XFormats::getFileParts(fileType, m_pDevice, XBinary::FILEPART_RESOURCE, -1, false, -1, m_pPdStruct);
     }
 
     qint32 nNumberOfParts = listParts.count();
