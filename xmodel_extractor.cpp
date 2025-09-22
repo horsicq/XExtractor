@@ -121,8 +121,8 @@ QVariant XModel_Extractor::data(const QModelIndex &index, int nRole) const
                     } else if (g_pData->emode == XExtractor::EMODE_FORMAT) {
                         if (nColumn == COLUMN_FORMAT_TYPE) {
                             QString sFileType = XBinary::fileTypeIdToString(g_pData->listRecords.at(nRow).fileType);
-                            if (g_pData->listRecords.at(nRow).fileTypeExtra != XBinary::FT_UNKNOWN)
-                                sFileType += " / " + XBinary::fileTypeIdToString(g_pData->listRecords.at(nRow).fileTypeExtra);
+                            if (g_pData->listRecords.at(nRow).handleMethod != XBinary::HANDLE_METHOD_UNKNOWN)
+                                sFileType += " / " + XBinary::handleMethodToString(g_pData->listRecords.at(nRow).handleMethod);
                             result = sFileType;
                         } else if (nColumn == COLUMN_FORMAT_INFO) {
                             result = g_pData->listRecords.at(nRow).sString;
@@ -132,8 +132,8 @@ QVariant XModel_Extractor::data(const QModelIndex &index, int nRole) const
                     } else if (g_pData->emode == XExtractor::EMODE_RAW) {
                         if (nColumn == COLUMN_RAW_TYPE) {
                             QString sFileType = XBinary::fileTypeIdToString(g_pData->listRecords.at(nRow).fileType);
-                            if (g_pData->listRecords.at(nRow).fileTypeExtra != XBinary::FT_UNKNOWN)
-                                sFileType += " / " + XBinary::fileTypeIdToString(g_pData->listRecords.at(nRow).fileTypeExtra);
+                            if (g_pData->listRecords.at(nRow).handleMethod != XBinary::HANDLE_METHOD_UNKNOWN)
+                                sFileType += " / " + XBinary::handleMethodToString(g_pData->listRecords.at(nRow).handleMethod);
                             result = sFileType;
                         } else if (nColumn == COLUMN_RAW_INFO) {
                             result = g_pData->listRecords.at(nRow).sString;

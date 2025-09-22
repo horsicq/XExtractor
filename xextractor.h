@@ -58,8 +58,7 @@ public:
         qint64 nOffset;
         qint64 nSize;
         XBinary::FT fileType;
-        XBinary::FT fileTypeExtra;
-        bool bNeedConvert;
+        XBinary::HANDLE_METHOD handleMethod;
         QMap<XBinary::FPART_PROP, QVariant> mapProperties;
         QString sString;
         QString sName;  // For unpack mode

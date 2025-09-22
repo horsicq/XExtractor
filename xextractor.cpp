@@ -528,16 +528,15 @@ void XExtractor::handleFormatUnpack(XBinary::FT fileType, bool bUnpack)
                 } else {
                     QSet<XBinary::FT> stFileTypes;
                     XBinary::FT fileTypePref = (XBinary::FT)(fpart.mapProperties.value(XBinary::FPART_PROP_FILETYPE, XBinary::FT_UNKNOWN).toUInt());
-                    XBinary::FT fileTypeExtra = (XBinary::FT)(fpart.mapProperties.value(XBinary::FPART_PROP_FILETYPE_EXTRA, XBinary::FT_UNKNOWN).toUInt());
+                    XBinary::HANDLE_METHOD handleMethod = (XBinary::HANDLE_METHOD)(fpart.mapProperties.value(XBinary::FPART_PROP_HANDLEMETHOD, XBinary::HANDLE_METHOD_UNKNOWN).toUInt());
 
-                    if (fileTypeExtra != XBinary::FT_UNKNOWN) {
+                    if (handleMethod != XBinary::FT_UNKNOWN) {
                         stFileTypes.insert(fileTypePref);
 
                         record.sExt = fpart.mapProperties.value(XBinary::FPART_PROP_EXT, QString()).toString();
                         record.fileType = fileTypePref;
-                        record.fileTypeExtra = fileTypeExtra;
+                        record.handleMethod = handleMethod;
                         record.sString = fpart.mapProperties.value(XBinary::FPART_PROP_INFO, false).toString();
-                        record.bNeedConvert = true;
                     } else {
                         XCompressedDevice compressedDevice;
                         compressedDevice.setData(m_pDevice, fpart, m_pPdStruct);
@@ -667,20 +666,16 @@ void XExtractor::process()
 
                 sName = XBinary::fileTypeIdToFtString(m_pData->listRecords.at(i).fileType) + QDir::separator() + sName;
 
-                if (m_pData->listRecords.at(i).bNeedConvert) {
-                    // TODO
-                } else {
-                    XBinary::FPART part = {};
-                    part.mapProperties = m_pData->listRecords.at(i).mapProperties;
-                    part.nFileOffset = m_pData->listRecords.at(i).nOffset;
-                    part.nFileSize = m_pData->listRecords.at(i).nSize;
-                    part.sName = m_pData->listRecords.at(i).sString;
-                    part.sOriginalName = sName;
-                    // part.sExt = m_pData->listRecords.at(i).sExt;
-                    // part.fileType = m_pData->listRecords.at(i).fileType;
+                XBinary::FPART part = {};
+                part.mapProperties = m_pData->listRecords.at(i).mapProperties;
+                part.nFileOffset = m_pData->listRecords.at(i).nOffset;
+                part.nFileSize = m_pData->listRecords.at(i).nSize;
+                part.sName = m_pData->listRecords.at(i).sString;
+                part.sOriginalName = sName;
+                // part.sExt = m_pData->listRecords.at(i).sExt;
+                // part.fileType = m_pData->listRecords.at(i).fileType;
 
-                    listParts.append(part);
-                }
+                listParts.append(part);
             }
 
             if (listParts.count()) {
