@@ -483,7 +483,7 @@ void XExtractor::handleRaw()
     XBinary::setPdStructFinished(m_pPdStruct, nGlobalIndex);
 }
 
-void XExtractor::handleFormatUnpack(XBinary::FT fileType, bool bUnpack)
+void XExtractor::handleFormatAndUnpack(XBinary::FT fileType, bool bUnpack)
 {
     m_pData->emode = (bUnpack ? EMODE_UNPACK : EMODE_FORMAT);
     m_pData->listRecords.clear();
@@ -552,6 +552,13 @@ void XExtractor::handleFormatUnpack(XBinary::FT fileType, bool bUnpack)
                             record.sString = XBinary::getFileFormatString(&formatInfo);
                             record.nCRC = XBinary::_getCRC32(&compressedDevice, m_pPdStruct);
 
+                            if ((fileType == XBinary::FT_APK) || (fileType == XBinary::FT_APKS)) {
+                                if ((record.fileType == XBinary::FT_ANDROIDASRC) || (record.fileType == XBinary::FT_ANDROIDXML)) {
+                                    record.fileType = XBinary::FT_XML;
+                                    record.handleMethod = XBinary::HANDLE_METHOD_ANDROID_XML;
+                                }
+                            }
+
                             compressedDevice.close();
                         }
                     }
@@ -599,19 +606,20 @@ void XExtractor::process()
     XBinary::FT fileType = m_pData->options.fileType;
 
     if (fileType == XBinary::FT_UNKNOWN) {
-        fileType = XBinary::getPrefFileType(m_pDevice, true);
+        QSet<XBinary::FT> stFileTypes = XFormats::getFileTypes(m_pDevice, true);
+        fileType = XBinary::_getPrefFileType(&stFileTypes);
     }
 
     if (m_pData->options.bAnalyze) {
         if (m_pData->options.emode == EMODE_HEURISTIC) {
             if (isFormatModeAvailable(fileType)) {
-                handleFormatUnpack(fileType, false);
+                handleFormatAndUnpack(fileType, false);
             } else {
                 handleRaw();
             }
         } else if (m_pData->options.emode == EMODE_FORMAT) {
             if (isFormatModeAvailable(fileType)) {
-                handleFormatUnpack(fileType, false);
+                handleFormatAndUnpack(fileType, false);
             } else {
                 bInvalidMode = true;
             }
@@ -619,7 +627,7 @@ void XExtractor::process()
             handleRaw();
         } else if (m_pData->options.emode == EMODE_UNPACK) {
             if (isUnpackModeAvailable(fileType)) {
-                handleFormatUnpack(fileType, true);
+                handleFormatAndUnpack(fileType, true);
             } else {
                 bInvalidMode = true;
             }
@@ -679,10 +687,10 @@ void XExtractor::process()
             }
 
             if (listParts.count()) {
-                XDecompress xDecompress;
-                _connect(&xDecompress);
+                XFormats xformats;
+                _connect(&xformats);
 
-                xDecompress.unpackFilePartsToFolder(&listParts, m_pDevice, m_pData->options.sOutputDirectory, m_pPdStruct);
+                xformats.extractFilePartsToFolder(&listParts, m_pDevice, m_pData->options.sOutputDirectory, m_pPdStruct);
             }
 
             XBinary::setPdStructFinished(m_pPdStruct, nFreeIndex);
