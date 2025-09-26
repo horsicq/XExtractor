@@ -528,7 +528,8 @@ void XExtractor::handleFormatAndUnpack(XBinary::FT fileType, bool bUnpack)
                 } else {
                     QSet<XBinary::FT> stFileTypes;
                     XBinary::FT fileTypePref = (XBinary::FT)(fpart.mapProperties.value(XBinary::FPART_PROP_FILETYPE, XBinary::FT_UNKNOWN).toUInt());
-                    XBinary::HANDLE_METHOD handleMethod = (XBinary::HANDLE_METHOD)(fpart.mapProperties.value(XBinary::FPART_PROP_HANDLEMETHOD, XBinary::HANDLE_METHOD_UNKNOWN).toUInt());
+                    XBinary::HANDLE_METHOD handleMethod =
+                        (XBinary::HANDLE_METHOD)(fpart.mapProperties.value(XBinary::FPART_PROP_HANDLEMETHOD, XBinary::HANDLE_METHOD_UNKNOWN).toUInt());
 
                     if (handleMethod != XBinary::FT_UNKNOWN) {
                         stFileTypes.insert(fileTypePref);
