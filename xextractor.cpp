@@ -506,7 +506,7 @@ void XExtractor::handleFormatAndUnpack(XBinary::FT fileType, bool bUnpack)
         for (qint32 i = 0; (i < nNumberOfParts) && XBinary::isPdStructNotCanceled(m_pPdStruct); i++) {
             XBinary::FPART fpart = listParts.at(i);
 
-            QString sPrefName = fpart.sOriginalName;
+            QString sPrefName = fpart.mapProperties.value(XBinary::FPART_PROP_ORIGINALNAME).toString();
 
             if (sPrefName == "") {
                 sPrefName = fpart.sName;
@@ -531,7 +531,7 @@ void XExtractor::handleFormatAndUnpack(XBinary::FT fileType, bool bUnpack)
                     XBinary::HANDLE_METHOD handleMethod =
                         (XBinary::HANDLE_METHOD)(fpart.mapProperties.value(XBinary::FPART_PROP_HANDLEMETHOD, XBinary::HANDLE_METHOD_UNKNOWN).toUInt());
 
-                    if (handleMethod != XBinary::FT_UNKNOWN) {
+                    if (handleMethod != XBinary::HANDLE_METHOD_UNKNOWN) {
                         stFileTypes.insert(fileTypePref);
 
                         record.sExt = fpart.mapProperties.value(XBinary::FPART_PROP_EXT, QString()).toString();
@@ -649,7 +649,7 @@ void XExtractor::process()
             QString sOutputDirectory = m_pData->options.sOutputDirectory + QDir::separator() + XBinary::getDeviceFileBaseName(m_pDevice);
             xformats.unpackDeviceToFolder(fileType, m_pDevice, sOutputDirectory, m_pPdStruct);
         } else if ((m_pData->emode == EMODE_FORMAT) || (m_pData->emode == EMODE_RAW)) {
-            QList<XBinary::FPART> listParts;
+            QList<XBinary::ARCHIVERECORD> listArchiveRecords;
 
             qint32 nFreeIndex = XBinary::getFreeIndex(m_pPdStruct);
             qint32 nNumberOfRecords = m_pData->listRecords.count();
@@ -675,23 +675,22 @@ void XExtractor::process()
 
                 sName = XBinary::fileTypeIdToFtString(m_pData->listRecords.at(i).fileType) + QDir::separator() + sName;
 
-                XBinary::FPART part = {};
-                part.mapProperties = m_pData->listRecords.at(i).mapProperties;
-                part.nFileOffset = m_pData->listRecords.at(i).nOffset;
-                part.nFileSize = m_pData->listRecords.at(i).nSize;
-                part.sName = m_pData->listRecords.at(i).sString;
-                part.sOriginalName = sName;
+                XBinary::ARCHIVERECORD archiveRecord = {};
+                archiveRecord.mapProperties = m_pData->listRecords.at(i).mapProperties;
+                archiveRecord.nStreamOffset = m_pData->listRecords.at(i).nOffset;
+                archiveRecord.nStreamSize = m_pData->listRecords.at(i).nSize;
+                archiveRecord.mapProperties.insert(XBinary::FPART_PROP_ORIGINALNAME, m_pData->listRecords.at(i).sString);
                 // part.sExt = m_pData->listRecords.at(i).sExt;
                 // part.fileType = m_pData->listRecords.at(i).fileType;
 
-                listParts.append(part);
+                listArchiveRecords.append(archiveRecord);
             }
 
-            if (listParts.count()) {
+            if (listArchiveRecords.count()) {
                 XFormats xformats;
                 _connect(&xformats);
 
-                xformats.extractFilePartsToFolder(&listParts, m_pDevice, m_pData->options.sOutputDirectory, m_pPdStruct);
+                xformats.extractArchiveRecordsToFolder(&listArchiveRecords, m_pDevice, m_pData->options.sOutputDirectory, m_pPdStruct);
             }
 
             XBinary::setPdStructFinished(m_pPdStruct, nFreeIndex);
