@@ -63,7 +63,7 @@ public:
     virtual SORT_METHOD getSortMethod(qint32 nColumn);
 
 private:
-    XExtractor::DATA *g_pData;
+    XExtractor::DATA *m_pData;
     XBinary::MODE g_modeAddress;
     XBinary::MODE g_modeOffset;
 };

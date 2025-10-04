@@ -22,7 +22,7 @@
 
 XModel_Extractor::XModel_Extractor(XExtractor::DATA *pData, QObject *pParent) : XModel(pParent)
 {
-    g_pData = pData;
+    m_pData = pData;
 
     _setRowCount(pData->listRecords.count());
 
@@ -93,50 +93,50 @@ QVariant XModel_Extractor::data(const QModelIndex &index, int nRole) const
     if (index.isValid()) {
         qint32 nRow = index.row();
 
-        if ((nRow >= 0) && (g_pData->listRecords.count() > nRow)) {
+        if ((nRow >= 0) && (m_pData->listRecords.count() > nRow)) {
             qint32 nColumn = index.column();
 
             if (nRole == Qt::DisplayRole) {
                 if (nColumn == COLUMN_GENERIC_NUMBER) {
                     result = nRow;
                 } else if (nColumn == COLUMN_GENERIC_OFFSET) {
-                    result = XBinary::valueToHex(g_modeOffset, g_pData->listRecords.at(nRow).nOffset);
+                    result = XBinary::valueToHex(g_modeOffset, m_pData->listRecords.at(nRow).nOffset);
                 } else if (nColumn == COLUMN_GENERIC_ADDRESS) {
-                    XADDR nAddress = XBinary::offsetToAddress(&(g_pData->memoryMap), g_pData->listRecords.at(nRow).nOffset);
+                    XADDR nAddress = XBinary::offsetToAddress(&(m_pData->memoryMap), m_pData->listRecords.at(nRow).nOffset);
                     if (nAddress != (XADDR)-1) {
                         result = XBinary::valueToHex(g_modeAddress, nAddress);
                     }
                 } else if (nColumn == COLUMN_GENERIC_REGION) {
-                    result = XBinary::getMemoryRecordByOffset(&(g_pData->memoryMap), g_pData->listRecords.at(nRow).nOffset).sName;
+                    result = XBinary::getMemoryRecordByOffset(&(m_pData->memoryMap), m_pData->listRecords.at(nRow).nOffset).sName;
                 } else if (nColumn == COLUMN_GENERIC_SIZE) {
-                    result = QString::number(g_pData->listRecords.at(nRow).nSize, 16);
+                    result = QString::number(m_pData->listRecords.at(nRow).nSize, 16);
                 } else if (nColumn == COLUMN_GENERIC_METHOD) {
                     result = XBinary::compressMethodToString((XBinary::COMPRESS_METHOD)(
-                        g_pData->listRecords.at(nRow).mapProperties.value(XBinary::FPART_PROP_COMPRESSMETHOD, XBinary::COMPRESS_METHOD_STORE).toInt()));
+                        m_pData->listRecords.at(nRow).mapProperties.value(XBinary::FPART_PROP_COMPRESSMETHOD, XBinary::COMPRESS_METHOD_STORE).toInt()));
                 } else if (nColumn >= __COLUMN_GENERIC_SIZE) {
-                    if (g_pData->emode == XExtractor::EMODE_UNPACK) {
+                    if (m_pData->emode == XExtractor::EMODE_UNPACK) {
                         if (nColumn == COLUMN_UNPACK_NAME) {
-                            result = g_pData->listRecords.at(nRow).sName;
+                            result = m_pData->listRecords.at(nRow).sName;
                         }
-                    } else if (g_pData->emode == XExtractor::EMODE_FORMAT) {
+                    } else if (m_pData->emode == XExtractor::EMODE_FORMAT) {
                         if (nColumn == COLUMN_FORMAT_TYPE) {
-                            QString sFileType = XBinary::fileTypeIdToString(g_pData->listRecords.at(nRow).fileType);
-                            if (g_pData->listRecords.at(nRow).handleMethod != XBinary::HANDLE_METHOD_UNKNOWN)
-                                sFileType += " / " + XBinary::handleMethodToString(g_pData->listRecords.at(nRow).handleMethod);
+                            QString sFileType = XBinary::fileTypeIdToString(m_pData->listRecords.at(nRow).fileType);
+                            if (m_pData->listRecords.at(nRow).handleMethod != XBinary::HANDLE_METHOD_UNKNOWN)
+                                sFileType += " / " + XBinary::handleMethodToString(m_pData->listRecords.at(nRow).handleMethod);
                             result = sFileType;
                         } else if (nColumn == COLUMN_FORMAT_INFO) {
-                            result = g_pData->listRecords.at(nRow).sString;
+                            result = m_pData->listRecords.at(nRow).sString;
                         } else if (nColumn == COLUMN_FORMAT_NAME) {
-                            result = g_pData->listRecords.at(nRow).sName;
+                            result = m_pData->listRecords.at(nRow).sName;
                         }
-                    } else if (g_pData->emode == XExtractor::EMODE_RAW) {
+                    } else if (m_pData->emode == XExtractor::EMODE_RAW) {
                         if (nColumn == COLUMN_RAW_TYPE) {
-                            QString sFileType = XBinary::fileTypeIdToString(g_pData->listRecords.at(nRow).fileType);
-                            if (g_pData->listRecords.at(nRow).handleMethod != XBinary::HANDLE_METHOD_UNKNOWN)
-                                sFileType += " / " + XBinary::handleMethodToString(g_pData->listRecords.at(nRow).handleMethod);
+                            QString sFileType = XBinary::fileTypeIdToString(m_pData->listRecords.at(nRow).fileType);
+                            if (m_pData->listRecords.at(nRow).handleMethod != XBinary::HANDLE_METHOD_UNKNOWN)
+                                sFileType += " / " + XBinary::handleMethodToString(m_pData->listRecords.at(nRow).handleMethod);
                             result = sFileType;
                         } else if (nColumn == COLUMN_RAW_INFO) {
-                            result = g_pData->listRecords.at(nRow).sString;
+                            result = m_pData->listRecords.at(nRow).sString;
                         }
                     }
                 }
@@ -145,15 +145,15 @@ QVariant XModel_Extractor::data(const QModelIndex &index, int nRole) const
             } else if (nRole == Qt::UserRole + USERROLE_ORIGINDEX) {
                 result = nRow;
             } else if (nRole == Qt::UserRole + USERROLE_ADDRESS) {
-                result = XBinary::offsetToAddress(&(g_pData->memoryMap), g_pData->listRecords.at(nRow).nOffset);
+                result = XBinary::offsetToAddress(&(m_pData->memoryMap), m_pData->listRecords.at(nRow).nOffset);
             } else if (nRole == Qt::UserRole + USERROLE_OFFSET) {
-                result = g_pData->listRecords.at(nRow).nOffset;
+                result = m_pData->listRecords.at(nRow).nOffset;
             } else if (nRole == Qt::UserRole + USERROLE_SIZE) {
-                result = g_pData->listRecords.at(nRow).nSize;
+                result = m_pData->listRecords.at(nRow).nSize;
             } else if (nRole == Qt::UserRole + USERROLE_STRING1) {
-                result = g_pData->listRecords.at(nRow).sString;
+                result = m_pData->listRecords.at(nRow).sString;
             } else if (nRole == Qt::UserRole + USERROLE_STRING2) {
-                result = g_pData->listRecords.at(nRow).sExt;
+                result = m_pData->listRecords.at(nRow).sExt;
             }
         }
     }
@@ -180,11 +180,11 @@ QVariant XModel_Extractor::headerData(int nSection, Qt::Orientation orientation,
             } else if (nSection == COLUMN_GENERIC_METHOD) {
                 result = tr("Method");
             } else if (nSection >= __COLUMN_GENERIC_SIZE) {
-                if (g_pData->emode == XExtractor::EMODE_UNPACK) {
+                if (m_pData->emode == XExtractor::EMODE_UNPACK) {
                     if (nSection == COLUMN_UNPACK_NAME) {
                         result = tr("Name");
                     }
-                } else if (g_pData->emode == XExtractor::EMODE_FORMAT) {
+                } else if (m_pData->emode == XExtractor::EMODE_FORMAT) {
                     if (nSection == COLUMN_FORMAT_TYPE) {
                         result = tr("Type");
                     } else if (nSection == COLUMN_FORMAT_INFO) {
@@ -192,7 +192,7 @@ QVariant XModel_Extractor::headerData(int nSection, Qt::Orientation orientation,
                     } else if (nSection == COLUMN_FORMAT_NAME) {
                         result = tr("Name");
                     }
-                } else if (g_pData->emode == XExtractor::EMODE_RAW) {
+                } else if (m_pData->emode == XExtractor::EMODE_RAW) {
                     if (nSection == COLUMN_RAW_TYPE) {
                         result = tr("Type");
                     } else if (nSection == COLUMN_RAW_INFO) {
