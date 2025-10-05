@@ -36,8 +36,8 @@ XModel_Extractor::XModel_Extractor(XExtractor::DATA *pData, QObject *pParent) : 
         _setColumnCount(__COLUMN_GENERIC_SIZE);
     }
 
-    g_modeAddress = XBinary::getWidthModeFromSize_32_64(pData->memoryMap.nModuleAddress + pData->memoryMap.nImageSize);
-    g_modeOffset = XBinary::getWidthModeFromSize_32_64(pData->memoryMap.nBinarySize);
+    m_modeAddress = XBinary::getWidthModeFromSize_32_64(pData->memoryMap.nModuleAddress + pData->memoryMap.nImageSize);
+    m_modeOffset = XBinary::getWidthModeFromSize_32_64(pData->memoryMap.nBinarySize);
 
     setColumnAlignment(COLUMN_GENERIC_NUMBER, Qt::AlignVCenter | Qt::AlignRight);
     setColumnAlignment(COLUMN_GENERIC_OFFSET, Qt::AlignVCenter | Qt::AlignRight);
@@ -58,10 +58,10 @@ XModel_Extractor::XModel_Extractor(XExtractor::DATA *pData, QObject *pParent) : 
     }
 
     setColumnSymbolSize(COLUMN_GENERIC_NUMBER, QString::number(rowCount()).length());
-    setColumnSymbolSize(COLUMN_GENERIC_OFFSET, XBinary::getByteSizeFromWidthMode(g_modeOffset) * 2);
-    setColumnSymbolSize(COLUMN_GENERIC_ADDRESS, XBinary::getByteSizeFromWidthMode(g_modeAddress) * 2);
+    setColumnSymbolSize(COLUMN_GENERIC_OFFSET, XBinary::getByteSizeFromWidthMode(m_modeOffset) * 2);
+    setColumnSymbolSize(COLUMN_GENERIC_ADDRESS, XBinary::getByteSizeFromWidthMode(m_modeAddress) * 2);
     setColumnSymbolSize(COLUMN_GENERIC_REGION, 1);
-    setColumnSymbolSize(COLUMN_GENERIC_SIZE, XBinary::getByteSizeFromWidthMode(g_modeOffset) * 2);
+    setColumnSymbolSize(COLUMN_GENERIC_SIZE, XBinary::getByteSizeFromWidthMode(m_modeOffset) * 2);
     setColumnSymbolSize(COLUMN_GENERIC_METHOD, 10);
 
     if (pData->emode == XExtractor::EMODE_UNPACK) {
@@ -100,11 +100,11 @@ QVariant XModel_Extractor::data(const QModelIndex &index, int nRole) const
                 if (nColumn == COLUMN_GENERIC_NUMBER) {
                     result = nRow;
                 } else if (nColumn == COLUMN_GENERIC_OFFSET) {
-                    result = XBinary::valueToHex(g_modeOffset, m_pData->listRecords.at(nRow).nOffset);
+                    result = XBinary::valueToHex(m_modeOffset, m_pData->listRecords.at(nRow).nOffset);
                 } else if (nColumn == COLUMN_GENERIC_ADDRESS) {
                     XADDR nAddress = XBinary::offsetToAddress(&(m_pData->memoryMap), m_pData->listRecords.at(nRow).nOffset);
                     if (nAddress != (XADDR)-1) {
-                        result = XBinary::valueToHex(g_modeAddress, nAddress);
+                        result = XBinary::valueToHex(m_modeAddress, nAddress);
                     }
                 } else if (nColumn == COLUMN_GENERIC_REGION) {
                     result = XBinary::getMemoryRecordByOffset(&(m_pData->memoryMap), m_pData->listRecords.at(nRow).nOffset).sName;

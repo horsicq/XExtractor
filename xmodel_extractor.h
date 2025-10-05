@@ -64,8 +64,8 @@ public:
 
 private:
     XExtractor::DATA *m_pData;
-    XBinary::MODE g_modeAddress;
-    XBinary::MODE g_modeOffset;
+    XBinary::MODE m_modeAddress;
+    XBinary::MODE m_modeOffset;
 };
 
 #endif  // XMODEL_EXTRACTOR_H
