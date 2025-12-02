@@ -50,11 +50,6 @@ class XModel_Extractor : public XModel {
         __COLUMN_FORMAT_SIZE
     };
 
-    enum COLUMN_UNPACK {
-        COLUMN_UNPACK_NAME = __COLUMN_GENERIC_SIZE,
-        __COLUMN_UNPACK_SIZE
-    };
-
 public:
     XModel_Extractor(XExtractor::DATA *pData, QObject *pParent = nullptr);
 

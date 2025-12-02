@@ -33,8 +33,7 @@ public:
         EMODE_UNKNOWN = 0,
         EMODE_RAW,
         EMODE_FORMAT,
-        EMODE_HEURISTIC,
-        EMODE_UNPACK,
+        EMODE_HEURISTIC
     };
 
     struct OPTIONS {
@@ -93,7 +92,7 @@ public:
 private:
     void handleSearch(qint32 nGlobalIndex, XBinary *pBinary, DATA *pData, XBinary::FT fileType, const QString &sSignature, qint32 nDelta, XBinary::PDSTRUCT *pPdStruct);
     void handleRaw();
-    void handleFormatAndUnpack(XBinary::FT fileType, bool bUnpack);
+    void handleFormat(XBinary::FT fileType);
 
 public slots:
     void process();

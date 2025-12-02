@@ -23,7 +23,6 @@
 XBinary::XCONVERT _TABLE_XExtractor_EMODE[] = {
     {XExtractor::EMODE_UNKNOWN, "Unknown", QObject::tr("Unknown")}, {XExtractor::EMODE_RAW, "Raw", QObject::tr("Raw")},
     {XExtractor::EMODE_FORMAT, "Format", QObject::tr("Format")},    {XExtractor::EMODE_HEURISTIC, "Heuristic", QObject::tr("Heuristic")},
-    {XExtractor::EMODE_UNPACK, "Unpack", QObject::tr("Unpack")},
 };
 
 bool compareXExtractor(const XExtractor::RECORD &a, const XExtractor::RECORD &b)
@@ -483,9 +482,9 @@ void XExtractor::handleRaw()
     XBinary::setPdStructFinished(m_pPdStruct, nGlobalIndex);
 }
 
-void XExtractor::handleFormatAndUnpack(XBinary::FT fileType, bool bUnpack)
+void XExtractor::handleFormat(XBinary::FT fileType)
 {
-    m_pData->emode = (bUnpack ? EMODE_UNPACK : EMODE_FORMAT);
+    m_pData->emode = EMODE_FORMAT;
     m_pData->listRecords.clear();
 
     QList<XBinary::FPART> listParts;
@@ -523,9 +522,7 @@ void XExtractor::handleFormatAndUnpack(XBinary::FT fileType, bool bUnpack)
                 record.mapProperties = fpart.mapProperties;
                 record.sName = sPrefName;
 
-                if (bUnpack) {
-                    bAdd = true;
-                } else {
+                {
                     QSet<XBinary::FT> stFileTypes;
                     XBinary::FT fileTypePref = (XBinary::FT)(fpart.mapProperties.value(XBinary::FPART_PROP_FILETYPE, XBinary::FT_UNKNOWN).toUInt());
                     XBinary::HANDLE_METHOD handleMethod =
@@ -614,24 +611,18 @@ void XExtractor::process()
     if (m_pData->options.bAnalyze) {
         if (m_pData->options.emode == EMODE_HEURISTIC) {
             if (isFormatModeAvailable(fileType)) {
-                handleFormatAndUnpack(fileType, false);
+                handleFormat(fileType);
             } else {
                 handleRaw();
             }
         } else if (m_pData->options.emode == EMODE_FORMAT) {
             if (isFormatModeAvailable(fileType)) {
-                handleFormatAndUnpack(fileType, false);
+                handleFormat(fileType);
             } else {
                 bInvalidMode = true;
             }
         } else if (m_pData->options.emode == EMODE_RAW) {
             handleRaw();
-        } else if (m_pData->options.emode == EMODE_UNPACK) {
-            if (isUnpackModeAvailable(fileType)) {
-                handleFormatAndUnpack(fileType, true);
-            } else {
-                bInvalidMode = true;
-            }
         }
     }
 
@@ -643,12 +634,7 @@ void XExtractor::process()
     }
 
     if (m_pData->options.bExtract) {
-        if (m_pData->emode == EMODE_UNPACK) {
-            XFormats xformats;
-            _connect(&xformats);
-            QString sOutputDirectory = m_pData->options.sOutputDirectory + QDir::separator() + XBinary::getDeviceFileBaseName(m_pDevice);
-            xformats.unpackDeviceToFolder(fileType, m_pDevice, sOutputDirectory, m_pPdStruct);
-        } else if ((m_pData->emode == EMODE_FORMAT) || (m_pData->emode == EMODE_RAW)) {
+        if ((m_pData->emode == EMODE_FORMAT) || (m_pData->emode == EMODE_RAW)) {
             QList<XBinary::ARCHIVERECORD> listArchiveRecords;
 
             qint32 nFreeIndex = XBinary::getFreeIndex(m_pPdStruct);

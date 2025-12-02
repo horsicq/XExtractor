@@ -26,9 +26,7 @@ XModel_Extractor::XModel_Extractor(XExtractor::DATA *pData, QObject *pParent) : 
 
     _setRowCount(pData->listRecords.count());
 
-    if (pData->emode == XExtractor::EMODE_UNPACK) {
-        _setColumnCount(__COLUMN_UNPACK_SIZE);
-    } else if (pData->emode == XExtractor::EMODE_FORMAT) {
+    if (pData->emode == XExtractor::EMODE_FORMAT) {
         _setColumnCount(__COLUMN_FORMAT_SIZE);
     } else if (pData->emode == XExtractor::EMODE_RAW) {
         _setColumnCount(__COLUMN_RAW_SIZE);
@@ -46,9 +44,7 @@ XModel_Extractor::XModel_Extractor(XExtractor::DATA *pData, QObject *pParent) : 
     setColumnAlignment(COLUMN_GENERIC_SIZE, Qt::AlignVCenter | Qt::AlignRight);
     setColumnAlignment(COLUMN_GENERIC_METHOD, Qt::AlignVCenter | Qt::AlignLeft);
 
-    if (pData->emode == XExtractor::EMODE_UNPACK) {
-        setColumnAlignment(COLUMN_UNPACK_NAME, Qt::AlignVCenter | Qt::AlignLeft);
-    } else if (pData->emode == XExtractor::EMODE_FORMAT) {
+    if (pData->emode == XExtractor::EMODE_FORMAT) {
         setColumnAlignment(COLUMN_FORMAT_TYPE, Qt::AlignVCenter | Qt::AlignLeft);
         setColumnAlignment(COLUMN_FORMAT_INFO, Qt::AlignVCenter | Qt::AlignLeft);
         setColumnAlignment(COLUMN_FORMAT_NAME, Qt::AlignVCenter | Qt::AlignLeft);
@@ -64,9 +60,7 @@ XModel_Extractor::XModel_Extractor(XExtractor::DATA *pData, QObject *pParent) : 
     setColumnSymbolSize(COLUMN_GENERIC_SIZE, XBinary::getByteSizeFromWidthMode(m_modeOffset) * 2);
     setColumnSymbolSize(COLUMN_GENERIC_METHOD, 10);
 
-    if (pData->emode == XExtractor::EMODE_UNPACK) {
-        setColumnSymbolSize(COLUMN_UNPACK_NAME, 10);
-    } else if (pData->emode == XExtractor::EMODE_FORMAT) {
+    if (pData->emode == XExtractor::EMODE_FORMAT) {
         setColumnSymbolSize(COLUMN_FORMAT_TYPE, 10);
         setColumnSymbolSize(COLUMN_FORMAT_INFO, 10);
         setColumnSymbolSize(COLUMN_FORMAT_NAME, 10);
@@ -114,11 +108,7 @@ QVariant XModel_Extractor::data(const QModelIndex &index, int nRole) const
                     result = XBinary::compressMethodToString((XBinary::COMPRESS_METHOD)(
                         m_pData->listRecords.at(nRow).mapProperties.value(XBinary::FPART_PROP_COMPRESSMETHOD, XBinary::COMPRESS_METHOD_STORE).toInt()));
                 } else if (nColumn >= __COLUMN_GENERIC_SIZE) {
-                    if (m_pData->emode == XExtractor::EMODE_UNPACK) {
-                        if (nColumn == COLUMN_UNPACK_NAME) {
-                            result = m_pData->listRecords.at(nRow).sName;
-                        }
-                    } else if (m_pData->emode == XExtractor::EMODE_FORMAT) {
+                    if (m_pData->emode == XExtractor::EMODE_FORMAT) {
                         if (nColumn == COLUMN_FORMAT_TYPE) {
                             QString sFileType = XBinary::fileTypeIdToString(m_pData->listRecords.at(nRow).fileType);
                             if (m_pData->listRecords.at(nRow).handleMethod != XBinary::HANDLE_METHOD_UNKNOWN)
@@ -180,11 +170,7 @@ QVariant XModel_Extractor::headerData(int nSection, Qt::Orientation orientation,
             } else if (nSection == COLUMN_GENERIC_METHOD) {
                 result = tr("Method");
             } else if (nSection >= __COLUMN_GENERIC_SIZE) {
-                if (m_pData->emode == XExtractor::EMODE_UNPACK) {
-                    if (nSection == COLUMN_UNPACK_NAME) {
-                        result = tr("Name");
-                    }
-                } else if (m_pData->emode == XExtractor::EMODE_FORMAT) {
+                if (m_pData->emode == XExtractor::EMODE_FORMAT) {
                     if (nSection == COLUMN_FORMAT_TYPE) {
                         result = tr("Type");
                     } else if (nSection == COLUMN_FORMAT_INFO) {
