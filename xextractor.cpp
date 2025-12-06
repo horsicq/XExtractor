@@ -21,8 +21,10 @@
 #include "xextractor.h"
 
 XBinary::XCONVERT _TABLE_XExtractor_EMODE[] = {
-    {XExtractor::EMODE_UNKNOWN, "Unknown", QObject::tr("Unknown")}, {XExtractor::EMODE_RAW, "Raw", QObject::tr("Raw")},
-    {XExtractor::EMODE_FORMAT, "Format", QObject::tr("Format")},    {XExtractor::EMODE_HEURISTIC, "Heuristic", QObject::tr("Heuristic")},
+    {XExtractor::EMODE_UNKNOWN, "Unknown", QObject::tr("Unknown")},
+    {XExtractor::EMODE_RAW, "Raw", QObject::tr("Raw")},
+    {XExtractor::EMODE_FORMAT, "Format", QObject::tr("Format")},
+    {XExtractor::EMODE_HEURISTIC, "Heuristic", QObject::tr("Heuristic")},
 };
 
 bool compareXExtractor(const XExtractor::RECORD &a, const XExtractor::RECORD &b)
