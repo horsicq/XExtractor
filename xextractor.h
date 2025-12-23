@@ -22,6 +22,7 @@
 #define XEXTRACTOR_H
 
 #include "xformats.h"
+#include "xcompresseddevice.h"
 #include "xthreadobject.h"
 #include <QAbstractItemModel>
 
