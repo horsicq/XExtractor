@@ -105,8 +105,8 @@ QVariant XModel_Extractor::data(const QModelIndex &index, int nRole) const
                 } else if (nColumn == COLUMN_GENERIC_SIZE) {
                     result = QString::number(m_pData->listRecords.at(nRow).nSize, 16);
                 } else if (nColumn == COLUMN_GENERIC_METHOD) {
-                    result = XBinary::compressMethodToString((XBinary::COMPRESS_METHOD)(
-                        m_pData->listRecords.at(nRow).mapProperties.value(XBinary::FPART_PROP_COMPRESSMETHOD, XBinary::COMPRESS_METHOD_STORE).toInt()));
+                    result = XBinary::handleMethodToString((XBinary::HANDLE_METHOD)(
+                        m_pData->listRecords.at(nRow).mapProperties.value(XBinary::FPART_PROP_HANDLEMETHOD1, XBinary::HANDLE_METHOD_STORE).toInt()));
                 } else if (nColumn >= __COLUMN_GENERIC_SIZE) {
                     if (m_pData->emode == XExtractor::EMODE_FORMAT) {
                         if (nColumn == COLUMN_FORMAT_TYPE) {

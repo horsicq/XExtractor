@@ -312,7 +312,7 @@ void XExtractor::handleSearch(qint32 nGlobalIndex, XBinary *pBinary, DATA *pData
                             if (formatInfo.bIsValid) {
                                 RECORD record = {};
 
-                                record.mapProperties.insert(XBinary::FPART_PROP_COMPRESSMETHOD, XArchive::COMPRESS_METHOD_STORE);
+                                record.mapProperties.insert(XBinary::FPART_PROP_HANDLEMETHOD1, XArchive::HANDLE_METHOD_STORE);
                                 record.nOffset = _nOffset;
                                 record.nSize = nFileFormatSize;
 
@@ -528,7 +528,7 @@ void XExtractor::handleFormat(XBinary::FT fileType)
                     QSet<XBinary::FT> stFileTypes;
                     XBinary::FT fileTypePref = (XBinary::FT)(fpart.mapProperties.value(XBinary::FPART_PROP_FILETYPE, XBinary::FT_UNKNOWN).toUInt());
                     XBinary::HANDLE_METHOD handleMethod =
-                        (XBinary::HANDLE_METHOD)(fpart.mapProperties.value(XBinary::FPART_PROP_HANDLEMETHOD, XBinary::HANDLE_METHOD_UNKNOWN).toUInt());
+                        (XBinary::HANDLE_METHOD)(fpart.mapProperties.value(XBinary::FPART_PROP_HANDLEMETHOD2, XBinary::HANDLE_METHOD_UNKNOWN).toUInt());
 
                     if (handleMethod != XBinary::HANDLE_METHOD_UNKNOWN) {
                         stFileTypes.insert(fileTypePref);
