@@ -312,7 +312,7 @@ void XExtractor::handleSearch(qint32 nGlobalIndex, XBinary *pBinary, DATA *pData
                             if (formatInfo.bIsValid) {
                                 RECORD record = {};
 
-                                record.mapProperties.insert(XBinary::FPART_PROP_HANDLEMETHOD1, XArchive::HANDLE_METHOD_STORE);
+                                record.mapProperties.insert(XBinary::FPART_PROP_HANDLEMETHOD, XArchive::HANDLE_METHOD_STORE);
                                 record.nOffset = _nOffset;
                                 record.nSize = nFileFormatSize;
 
