@@ -1,0 +1,3 @@
+[submodule "XPEID"]
+	path = XPEID
+	url = https://github.com/horsicq/XPEID
