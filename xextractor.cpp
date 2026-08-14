@@ -294,7 +294,7 @@ void XExtractor::handleSearch(qint32 nGlobalIndex, XBinary *pBinary, DATA *pData
 
                         if (subdevice.open(QIODevice::ReadOnly)) {
                             if (XFormats::isValid(fileType, &subdevice, false, -1, pPdStruct)) {
-                                QSet<XBinary::FT> stFT = XFormats::getFileTypes(&subdevice, true, pPdStruct);
+                                QSet<XBinary::FT> stFT = XFormats::getFileTypes(&subdevice, XBinary::FT_FLAG_FORMATS, pPdStruct);
                                 _fileType = XBinary::_getPrefFileType(&stFT);
                                 nFileFormatSize = XFormats::getFileFormatSize(_fileType, &subdevice, false, -1, pPdStruct);
                             }
@@ -542,7 +542,7 @@ void XExtractor::handleFormat(XBinary::FT fileType)
                         compressedDevice.setData(m_pDevice, fpart, m_pPdStruct);
 
                         if (compressedDevice.open(QIODevice::ReadOnly)) {
-                            stFileTypes = XFormats::getFileTypes(&compressedDevice, true, m_pPdStruct);
+                            stFileTypes = XFormats::getFileTypes(&compressedDevice, XBinary::FT_FLAG_FORMATS, m_pPdStruct);
                             fileTypePref = XBinary::_getPrefFileType(&stFileTypes);
 
                             XBinary::FILEFORMATINFO formatInfo = XFormats::getFileFormatInfo(fileTypePref, &compressedDevice, false, -1, m_pPdStruct);
@@ -606,7 +606,7 @@ void XExtractor::process()
     XBinary::FT fileType = m_pData->options.fileType;
 
     if (fileType == XBinary::FT_UNKNOWN) {
-        QSet<XBinary::FT> stFileTypes = XFormats::getFileTypes(m_pDevice, true);
+        QSet<XBinary::FT> stFileTypes = XFormats::getFileTypes(m_pDevice, XBinary::FT_FLAG_FORMATS);
         fileType = XBinary::_getPrefFileType(&stFileTypes);
     }
 
