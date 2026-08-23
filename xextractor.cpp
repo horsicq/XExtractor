@@ -452,6 +452,8 @@ void XExtractor::handleRaw()
     handleSearch(nGlobalIndex, &binary, m_pData, XBinary::FT_MACHO, "CFFAEDFE", 0, m_pPdStruct);
     handleSearch(nGlobalIndex, &binary, m_pData, XBinary::FT_MACHOFAT, "CAFEBABE", 0, m_pPdStruct);
     handleSearch(nGlobalIndex, &binary, m_pData, XBinary::FT_MACHOFAT, "BEBAFECA", 0, m_pPdStruct);
+    handleSearch(nGlobalIndex, &binary, m_pData, XBinary::FT_MACHOFAT, "CAFEBABF", 0, m_pPdStruct);
+    handleSearch(nGlobalIndex, &binary, m_pData, XBinary::FT_MACHOFAT, "BFBAFECA", 0, m_pPdStruct);
     handleSearch(nGlobalIndex, &binary, m_pData, XBinary::FT_BMP, "'BM'", 0, m_pPdStruct);
     handleSearch(nGlobalIndex, &binary, m_pData, XBinary::FT_GIF, "'GIF8'", 0, m_pPdStruct);
     handleSearch(nGlobalIndex, &binary, m_pData, XBinary::FT_TIFF, "'MM'002A", 0, m_pPdStruct);
