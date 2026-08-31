@@ -1,8 +1,6 @@
 INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD
 
-XCONFIG += use_dex
-XCONFIG += use_pdf
 XCONFIG += use_archive
 
 HEADERS += \
